@@ -1,16 +1,26 @@
 const journeys = [
   {
     id: 1,
-    name: "Japan"
+    title: "Da Nang Family Trip",
+    budget: 12000000,
+    startDate: "2026-06-10",
+    endDate: "2026-06-15",
+    note: "Family summer vacation",
+    thumbnail: "",
+    itinerary: [],
+    packingList: [],
+    budgetItems: [],
+    id: 1,
+    title: "Da Nang Family Trip",
+    budget: 12000000,
+    startDate: "2026-06-10",
+    endDate: "2026-06-15",
+    note: "Family summer vacation",
+    thumbnail: "",
+    itinerary: [],
+    packingList: [],
+    budgetItems: [],
   },
-  {
-    id: 2,
-    name: "Australia"
-  },
-  {
-    id: 3,
-    name: "Korea"
-  }
 ]
 
 export default journeys

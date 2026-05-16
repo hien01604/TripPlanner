@@ -1,6 +1,5 @@
-function Dashboard() {
-  return (
-    <h1>Dashboard</h1>
-  )
-}       
+function Dashboard({ journey }) {
+  return <div></div>
+}
+
 export default Dashboard
