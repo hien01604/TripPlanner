@@ -1,0 +1,545 @@
+.itinerary-page {
+  min-height: 100vh;
+  padding: 42px 32px;
+  background: #ffffff;
+  font-family: Arial, sans-serif;
+  color: #242424;
+}
+
+.itinerary-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #8b8b8b;
+  font-size: 14px;
+}
+
+.breadcrumb strong {
+  color: #333;
+  font-weight: 600;
+}
+
+.last-modified {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #333;
+  font-size: 14px;
+}
+
+.status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #6ed36b;
+}
+
+.itinerary-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding-bottom: 34px;
+  border-bottom: 1px solid #e8e8e8;
+}
+
+.itinerary-header h1 {
+  margin: 0;
+  font-size: 36px;
+  font-weight: 700;
+}
+
+.itinerary-header p {
+  margin: 8px 0 0;
+  color: #666;
+  font-size: 16px;
+}
+
+.header-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.header-actions button {
+  height: 38px;
+  padding: 0 18px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.export-btn {
+  background: #ffffff;
+  border-color: #dddddd !important;
+  color: #333;
+}
+
+.add-btn {
+  background: #45c0c0;
+  color: white;
+}
+
+.itinerary-toolbar {
+  display: grid;
+  grid-template-columns: 180px 1fr 1fr 1fr;
+  gap: 56px;
+  padding: 20px 0;
+}
+
+.itinerary-toolbar select,
+.date-filter {
+  height: 40px;
+  border: 1px solid #e2e2e2;
+  border-radius: 6px;
+  background: #fff;
+  color: #333;
+  padding: 0 14px;
+  font-size: 14px;
+}
+
+.date-filter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.date-filter span {
+  display: none;
+}
+
+.date-filter input[type="month"] {
+  width: 100%;
+  height: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: #333;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.date-filter input[type="month"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 1;
+}
+
+.date-filter svg {
+  color: #555;
+  pointer-events: none;
+}
+
+.days-strip {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(76px, 1fr));
+  gap: 0;
+  border-bottom: 1px solid #eeeeee;
+  overflow-x: auto;
+}
+
+.day-item {
+  min-width: 76px;
+  height: 64px;
+  border: none;
+  border-left: 1px solid #eeeeee;
+  background: white;
+  color: #242424;
+  cursor: pointer;
+  position: relative;
+}
+
+.day-item span {
+  display: block;
+  font-size: 22px;
+  font-weight: 500;
+}
+
+.day-item small {
+  display: block;
+  margin-top: 6px;
+  color: #999;
+  font-size: 14px;
+}
+
+.day-item.selected {
+  background: #347c7d;
+  color: white;
+  border-radius: 4px;
+}
+
+.day-item.selected small {
+  color: white;
+}
+
+.day-item.has-activities:not(.selected) {
+  background: #f2fbfb;
+}
+
+.day-item.has-activities:not(.selected) span {
+  color: #2f7d7d;
+  font-weight: 700;
+}
+
+.day-item.has-activities::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 7px;
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: #45c0c0;
+  transform: translateX(-50%);
+}
+
+.day-item.selected.has-activities::before {
+  background: #ffffff;
+}
+
+.day-item:not(.selected)::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 28%;
+  right: 28%;
+  height: 3px;
+  background: transparent;
+}
+
+.day-item:not(.selected):hover::after {
+  background: #58b6b6;
+}
+
+.day-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 22px 0 14px;
+}
+
+.day-section h2 {
+  margin: 0;
+  color: #346869;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.day-section p {
+  margin: 4px 0 0;
+  color: #777;
+  font-size: 16px;
+}
+
+.day-controls {
+  display: flex;
+  gap: 18px;
+}
+
+.day-controls button {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid #346869;
+  background: white;
+  color: #346869;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  font-size: 20px;
+}
+
+.day-controls button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.activity-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.timeline-row {
+  display: grid;
+  grid-template-columns: 116px 1fr;
+  gap: 28px;
+  align-items: stretch;
+}
+
+.time-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.time-pill {
+  min-width: 92px;
+  height: 42px;
+  border-radius: 8px;
+  background: #c9f3f1;
+  color: #3b9696;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.22);
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.timeline-line {
+  width: 1px;
+  flex: 1;
+  min-height: 54px;
+  background: #d5d5d5;
+  margin-top: 12px;
+}
+
+.timeline-row:last-child .timeline-line {
+  display: none;
+}
+
+.activity-card {
+  min-height: 88px;
+  border-radius: 8px;
+  border: 1px solid #d7d7d7;
+  background: #ffffff;
+  box-shadow: 0 2px 7px rgba(0, 0, 0, 0.18);
+  display: grid;
+  grid-template-columns: 32px 1fr 70px;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+}
+
+.activity-card.done {
+  border-color: #b8e7bd;
+  box-shadow: 0 0 0 1px rgba(91, 190, 101, 0.18),
+    0 2px 7px rgba(0, 0, 0, 0.14);
+}
+
+.activity-card.planned {
+  background: #f8dddd;
+  border-color: #e69b9b;
+}
+
+.activity-card.in-progress {
+  background: #ffffff;
+}
+
+.activity-card.overdue {
+  border-color: #ef4444;
+  background: #fff1f1;
+  box-shadow: 0 0 0 1px rgba(239, 68, 68, 0.28),
+    0 2px 7px rgba(0, 0, 0, 0.16);
+}
+
+.check-btn {
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  color: #5fc46c;
+  font-size: 19px;
+}
+
+.activity-content {
+  min-width: 0;
+}
+
+.activity-title-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.activity-title-row h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #444;
+}
+
+.activity-card.done .activity-title-row h3 {
+  text-decoration: line-through;
+}
+
+.activity-content p {
+  margin: 8px 0;
+  color: #777;
+  font-size: 14px;
+}
+
+.tag-list {
+  display: flex;
+  gap: 8px;
+}
+
+.tag-list span,
+.status-pill,
+.overdue-pill {
+  border-radius: 999px;
+  padding: 5px 10px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.category-tag {
+  background: #dff5ec;
+  color: #45856e;
+}
+
+.priority-tag.high {
+  background: #ffcdd2;
+  color: #e23745;
+}
+
+.priority-tag.medium {
+  background: #fff0bd;
+  color: #9a7b00;
+}
+
+.priority-tag.low {
+  background: #d9f5df;
+  color: #398347;
+}
+
+.status-pill.done {
+  background: #c9efbd;
+  color: #4f9a42;
+}
+
+.status-pill.planned {
+  background: #bfecea;
+  color: #348384;
+}
+
+.status-pill.in-progress {
+  background: #edf0a7;
+  color: #828629;
+}
+
+.overdue-pill {
+  background: #fee2e2;
+  color: #dc2626;
+  font-weight: 700;
+}
+
+.card-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 14px;
+}
+
+.card-actions button {
+  border: none;
+  background: transparent;
+  color: #555;
+  cursor: pointer;
+  font-size: 17px;
+}
+
+.empty-state {
+  padding: 40px;
+  border: 1px dashed #d7d7d7;
+  border-radius: 8px;
+  color: #777;
+  text-align: center;
+}
+
+.activity-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.28);
+  display: grid;
+  place-items: center;
+  z-index: 50;
+}
+
+.activity-modal {
+  width: min(460px, calc(100vw - 32px));
+  background: white;
+  border-radius: 8px;
+  padding: 22px;
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.22);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.activity-modal h3 {
+  margin: 0 0 6px;
+  font-size: 22px;
+}
+
+.activity-modal input,
+.activity-modal select {
+  height: 40px;
+  border: 1px solid #dddddd;
+  border-radius: 6px;
+  padding: 0 12px;
+  font-size: 14px;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.modal-actions button {
+  height: 38px;
+  padding: 0 16px;
+  border-radius: 6px;
+  border: 1px solid #dddddd;
+  cursor: pointer;
+}
+
+.modal-actions button[type="submit"] {
+  border-color: transparent;
+  background: #45c0c0;
+  color: white;
+}
+
+@media (max-width: 900px) {
+  .itinerary-page {
+    padding: 24px 18px;
+  }
+
+  .itinerary-topbar,
+  .itinerary-header {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .itinerary-toolbar {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .timeline-row {
+    grid-template-columns: 92px 1fr;
+    gap: 14px;
+  }
+
+  .activity-card {
+    grid-template-columns: 28px 1fr;
+  }
+
+  .card-actions {
+    grid-column: 2;
+    justify-content: flex-start;
+  }
+}
