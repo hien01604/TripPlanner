@@ -3,7 +3,7 @@ import { FaChevronLeft, FaChevronRight } from "react-icons/fa"
 
 import JourneySidebar from "./components/JourneySidebar"
 import PlanningSidebar from "./components/PlanningSidebar"
-import Dashboard from "./pages/Dashboard"
+import Dashboard from "./pages/Dashboard/Dashboard"
 import Itinerary from "./pages/Itinerary"
 import Packing from "./pages/Packing"
 import Budget from "./pages/Budget"
