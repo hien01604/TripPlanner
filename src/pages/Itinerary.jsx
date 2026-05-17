@@ -54,6 +54,7 @@ const initialActivities = [
 ];
 
 const STORAGE_KEY = "tripplanner-itinerary-activities";
+const LAST_MODIFIED_KEY = "tripplanner-itinerary-last-modified";
 
 const formatLocalDate = (date) => {
   const year = date.getFullYear();
@@ -94,12 +95,61 @@ const formatHeadingDate = (dateString) => {
 };
 
 const formatTime = (time) => {
-  const [hourValue, minute] = time.split(":");
+  if (!time) return "";
+
+  const normalizedTime = time.trim();
+
+  if (normalizedTime.includes("AM") || normalizedTime.includes("PM")) {
+    return normalizedTime;
+  }
+
+  const [hourValue, minute] = normalizedTime.split(":");
   const hour = Number(hourValue);
   const suffix = hour >= 12 ? "PM" : "AM";
   const displayHour = hour % 12 || 12;
 
   return `${String(displayHour).padStart(2, "0")}:${minute} ${suffix}`;
+};
+
+const getTimeInMinutes = (time) => {
+  if (!time) return 0;
+
+  const normalizedTime = time.trim();
+
+  if (normalizedTime.includes("AM") || normalizedTime.includes("PM")) {
+    const [timePart, period] = normalizedTime.split(" ");
+    const [hourValue, minuteValue] = timePart.split(":").map(Number);
+
+    let hour = hourValue;
+
+    if (period === "PM" && hour !== 12) {
+      hour += 12;
+    }
+
+    if (period === "AM" && hour === 12) {
+      hour = 0;
+    }
+
+    return hour * 60 + minuteValue;
+  }
+
+  const [hourValue, minuteValue] = normalizedTime.split(":").map(Number);
+  return hourValue * 60 + minuteValue;
+};
+
+const formatLastModified = (dateString) => {
+  if (!dateString) return "Never modified";
+
+  const date = new Date(dateString);
+
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const year = date.getFullYear();
+
+  const hour = String(date.getHours()).padStart(2, "0");
+  const minute = String(date.getMinutes()).padStart(2, "0");
+
+  return `${day}/${month}/${year}, ${hour}:${minute}`;
 };
 
 const isActivityOverdue = (activity) => {
@@ -122,6 +172,10 @@ const Itinerary = () => {
     } catch {
       return initialActivities;
     }
+  });
+
+  const [lastModified, setLastModified] = useState(() => {
+    return localStorage.getItem(LAST_MODIFIED_KEY) || new Date().toISOString();
   });
 
   const [selectedDate, setSelectedDate] = useState("2026-05-13");
@@ -156,8 +210,15 @@ const Itinerary = () => {
           (!filters.priority || activity.priority === filters.priority)
         );
       })
-      .sort((a, b) => a.time.localeCompare(b.time));
+      .sort((a, b) => getTimeInMinutes(a.time) - getTimeInMinutes(b.time));
   }, [activities, selectedDate, filters]);
+
+  const updateLastModified = () => {
+    const now = new Date().toISOString();
+
+    setLastModified(now);
+    localStorage.setItem(LAST_MODIFIED_KEY, now);
+  };
 
   const handleMonthChange = (event) => {
     const newMonth = event.target.value;
@@ -218,6 +279,7 @@ const Itinerary = () => {
     }));
 
     setSelectedDate(form.date);
+    updateLastModified();
     closeModal();
   };
 
@@ -228,6 +290,8 @@ const Itinerary = () => {
     setActivities((prev) =>
       prev.filter((activity) => activity.id !== activityId)
     );
+
+    updateLastModified();
   };
 
   const handleChangeStatus = (activityId) => {
@@ -246,12 +310,15 @@ const Itinerary = () => {
         };
       })
     );
+
+    updateLastModified();
   };
 
   const handleExportJson = () => {
     const tripPlan = {
       trip: "Japan",
       exportedAt: new Date().toISOString(),
+      lastModified,
       activities,
     };
 
@@ -292,14 +359,14 @@ const Itinerary = () => {
 
         <div className="last-modified">
           <span className="status-dot"></span>
-          Last modified at 20/10/2025, 09:45
+          Last modified at {formatLastModified(lastModified)}
         </div>
       </div>
 
       <div className="itinerary-header">
         <div>
           <h1>Itinerary</h1>
-          <p>{activities.length} activities planned</p>
+          <p>{filteredActivities.length} activities planned</p>
         </div>
 
         <div className="header-actions">
