@@ -1,36 +1,41 @@
 import { useSelector } from "react-redux";
 import "./Dashboard.css";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+
 
 const Dashboard = () => {
   const trip = useSelector((state) => state.trip);
-
-  // Budget bars from Redux data
-  const budgetBars = trip.budgetItems.map(item => ({
-    label: item.category,
-    value: item.actualCost
-  }));
-  const maxValue = Math.max(...budgetBars.map(b => b.value));
+  const categories = ["Transport", "Accommodation", "Food", "Shopping", "Activity", "Other"];
 
 
   const totalUsedBudget = trip.budgetItems.reduce((sum, item) => sum + item.actualCost, 0);
+
+  const data = categories.map(category => {
+    const items = trip.budgetItems.filter(item => item.category === category);
+    const total = items.reduce((sum, i) => sum + i.actualCost, 0);
+    return { category, amount: total };
+  });
+
 
   return (
     <div className="dashboard-container">
       {/* Header */}
       <div className="dashboard-header">
-        <div className="header-left">
-          <p className="breadcrumb">Japan &gt; Dash Board</p>
-          <h1 className="dashboard-title">Dash Board</h1>
-          <p className="dashboard-subtitle">Track your trip progress at a glance.</p>
-        </div>
-        <div className="header-right">
-          <p className="user-name">Hachimi</p>
-          <p className="user-date">Jun 10 - Jun 15, 2026</p>
-          <button className="btn-view-itinerary">View Itinerary</button>
-        </div>
+      <div className="header-left">
+        <p className="breadcrumb">{trip.tripName} &gt; Dashboard</p>
+        <h1 className="dashboard-title">Dashboard</h1>
+        <p className="dashboard-subtitle">Track your trip progress at a glance.</p>
       </div>
+      <div className="header-right">
+        <p className="user-name">{trip.tripName}</p>
+        <p className="user-date">
+          {trip.itinerary[0]?.date || "Start"} - {trip.itinerary[trip.itinerary.length - 1]?.date || "End"}
+        </p>
+        <button className="btn-view-itinerary">View Itinerary</button>
+      </div>
+    </div>
 
-      {/* Stats Cards (keep original 5 cards) */}
+      {/* Stats Cards */}
       <div className="stats-cards">
         {[
           { title: "Itinerary", value: "75%", status: "Completed" },
@@ -75,23 +80,23 @@ const Dashboard = () => {
         {/* Budget by Categories (Redux + LocalStorage) */}
         <div className="card budget-chart">
           <h2>Budget by Categories</h2>
-          <div className="budget-bars">
-            {budgetBars.map((bar, idx) => (
-              <div key={idx} className="budget-bar-item">
-                <p className="bar-label">{bar.label}</p>
-                <div className="bar-container">
-                  <div
-                    className="bar"
-                    style={{ width: `${(bar.value / maxValue) * 100}%` }}
-                  ></div>
-                </div>
-                <p className="bar-value">${bar.value}</p>
-              </div>
-            ))}
-          </div>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={data} margin={{ top: 20, right: 30, left: 0, bottom: 60 }}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis
+                dataKey="category"
+                interval={0}
+                angle={-30}
+                textAnchor="end"
+              />
+              <YAxis />
+              <Tooltip formatter={(value) => `$${value}`} />
+              <Bar dataKey="amount" fill="#76A1C9" />
+            </BarChart>
+        </ResponsiveContainer>
         </div>
 
-        {/* Calendar & Timeline (keep original) */}
+        {/* Calendar & Timeline */}
         <div className="card calendar-timeline">
           <h2>2024 December</h2>
           <div className="calendar">
@@ -111,7 +116,7 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Budget Overview (Redux + LocalStorage) */}
+      {/* Budget Overview  */}
       <div className="card budget-overview">
         <h2>Budget Overview</h2>
         <div className="budget-summary">
