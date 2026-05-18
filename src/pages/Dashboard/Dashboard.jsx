@@ -1,16 +1,18 @@
+import { useSelector } from "react-redux";
 import "./Dashboard.css";
 
 const Dashboard = () => {
-  // Dữ liệu bar chart bằng CSS
-  const budgetBars = [
-    { label: "Transport", value: 4000 },
-    { label: "Transport", value: 3500 },
-    { label: "Transport", value: 5000 },
-    { label: "Transport", value: 4500 },
-    { label: "Transport", value: 6000 },
-    { label: "Transport", value: 5800 },
-  ];
+  const trip = useSelector((state) => state.trip);
+
+  // Budget bars from Redux data
+  const budgetBars = trip.budgetItems.map(item => ({
+    label: item.category,
+    value: item.actualCost
+  }));
   const maxValue = Math.max(...budgetBars.map(b => b.value));
+
+
+  const totalUsedBudget = trip.budgetItems.reduce((sum, item) => sum + item.actualCost, 0);
 
   return (
     <div className="dashboard-container">
@@ -28,7 +30,7 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Stats Cards */}
+      {/* Stats Cards (keep original 5 cards) */}
       <div className="stats-cards">
         {[
           { title: "Itinerary", value: "75%", status: "Completed" },
@@ -47,29 +49,30 @@ const Dashboard = () => {
 
       {/* Bottom Section */}
       <div className="bottom-section">
-        {/* Packing Progress */}
         <div className="card packing-progress">
-          <h2>Packing Progress</h2>
-          <p>Packed 41 of 60 items ready</p>
-          {[
-            { name: "Clothes", percent: 80 },
-            { name: "Documents", percent: 60 },
-            { name: "Electronics", percent: 50 },
-            { name: "Personal", percent: 70 },
-          ].map((item, idx) => (
-            <div key={idx} className="progress-item">
-              <p>{item.name}</p>
-              <div className="progress-bar">
-                <div
-                  className="progress-fill"
-                  style={{ width: `${item.percent}%` }}
-                ></div>
+            <h2>Packing Progress</h2>
+
+          {["Clothes", "Documents", "Electronics", "Medicine", "Personal", "Other"].map(category => {
+            const itemsInCategory = trip.packingList.filter(item => item.category === category);
+            const packedCount = itemsInCategory.filter(i => i.packedStatus === "Packed").length;
+            const totalCount = itemsInCategory.length || 1; // Avoid divide by zero
+            const percent = itemsInCategory.length === 0 ? 0 : Math.round((packedCount / totalCount) * 100);
+
+            return (
+              <div key={category} className="category-progress">
+                <h3>{category} ({packedCount}/{itemsInCategory.length || 0})</h3>
+                <div className="progress-bar">
+                  <div
+                    className="progress-fill"
+                    style={{ width: `${percent}%` }}
+                  ></div>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
-        {/* Budget by Categories (CSS bar chart) */}
+        {/* Budget by Categories (Redux + LocalStorage) */}
         <div className="card budget-chart">
           <h2>Budget by Categories</h2>
           <div className="budget-bars">
@@ -88,7 +91,7 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Calendar & Timeline */}
+        {/* Calendar & Timeline (keep original) */}
         <div className="card calendar-timeline">
           <h2>2024 December</h2>
           <div className="calendar">
@@ -108,18 +111,18 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Budget Overview */}
+      {/* Budget Overview (Redux + LocalStorage) */}
       <div className="card budget-overview">
         <h2>Budget Overview</h2>
         <div className="budget-summary">
-          <div>Total Budget: $2,400</div>
-          <div>Used: $1,488</div>
-          <div>Remaining: $912</div>
+          <div>Total Budget: ${trip.budget}</div>
+          <div>Used: ${totalUsedBudget}</div>
+          <div>Remaining: ${trip.budget - totalUsedBudget}</div>
         </div>
         <div className="progress-bar">
           <div
             className="progress-fill"
-            style={{ width: `${(1488/2400)*100}%` }}
+            style={{ width: `${(totalUsedBudget / trip.budget) * 100}%` }}
           ></div>
         </div>
         <button className="btn-view-budget">View Budget Details</button>
