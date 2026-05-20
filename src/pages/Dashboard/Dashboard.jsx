@@ -34,107 +34,285 @@ import JourneySidebar from "../../components/JourneySidebar";
 import PlanningSidebar from "../../components/PlanningSidebar";
 import "./Dashboard.css";
 
-const PACKING_CATEGORIES = ["Clothes", "Documents", "Electronics", "Personal"];
+
+const STAT_ICON_COMPONENTS = {
+  calendar: FaCalendarAlt,
+  clipboard: FaClipboardList,
+  dollar: FaDollarSign,
+  tag: FaTag,
+  bell: FaBell,
+};
+
+/**
+ * progress circle color + icon color
+ * @type {Record<string, { iconClass: string, ring: string }>}
+ */
+const STAT_VISUAL_BY_ICON = {
+  calendar: { iconClass: "stat-icon--blue", ring: "#3b82f6" },
+  clipboard: { iconClass: "stat-icon--teal", ring: "#4fd1c5" },
+  dollar: { iconClass: "stat-icon--green", ring: "#10b981" },
+  tag: { iconClass: "stat-icon--yellow", ring: "#f59e0b" },
+  bell: { iconClass: "stat-icon--red", ring: "#ef4444" },
+};
+
+const DEFAULT_STAT_VISUAL = {
+  iconClass: "stat-icon--blue",
+  ring: "#3b82f6",
+};
+
+const RING_SIZE = 92;
+const RING_STROKE = 6;
+
+
+function StatProgressRing({ percent, ringColor, alert, children }) {
+  const size = RING_SIZE;
+  const stroke = RING_STROKE;
+  const r = (size - stroke) / 2;
+  const c = 2 * Math.PI * r;
+  const p = Math.min(100, Math.max(0, percent));
+  const offset = c * (1 - p / 100);
+  const cx = size / 2;
+  const strokeColor = alert ? "#ef4444" : ringColor;
+
+  return (
+    <div className="stat-ring">
+      <svg
+        width={size}
+        height={size}
+        viewBox={`0 0 ${size} ${size}`}
+        className="stat-ring__svg"
+        aria-hidden
+      >
+        <circle
+          className="stat-ring__track"
+          cx={cx}
+          cy={cx}
+          r={r}
+          strokeWidth={stroke}
+          fill="none"
+        />
+        <circle
+          className="stat-ring__progress"
+          cx={cx}
+          cy={cx}
+          r={r}
+          strokeWidth={stroke}
+          fill="none"
+          stroke={strokeColor}
+          strokeLinecap="round"
+          strokeDasharray={c}
+          strokeDashoffset={offset}
+          transform={`rotate(-90 ${cx} ${cx})`}
+        />
+      </svg>
+      <div className="stat-ring__center">{children}</div>
+    </div>
+  );
+}
 
 const CATEGORY_COLORS = {
   Clothes: "#3B82F6",
   Documents: "#4FD1C5",
   Electronics: "#8B5CF6",
   Personal: "#F59E0B",
+  Other: "#10B981",
 };
 
-const STAT_CARDS = [
-  {
-    label: "Itinerary Completed",
-    value: "75%",
-    icon: FaCalendarAlt,
-    iconClass: "stat-icon--blue",
-  },
-  {
-    label: "Packing Completed",
-    value: "75%",
-    icon: FaClipboardList,
-    iconClass: "stat-icon--teal",
-  },
-  {
-    label: "Budget Used",
-    value: "75%",
-    icon: FaDollarSign,
-    iconClass: "stat-icon--green",
-  },
-  {
-    label: "Unpaid Items",
-    value: "16",
-    icon: FaTag,
-    iconClass: "stat-icon--yellow",
-  },
-  {
-    label: "Overdue/Alert",
-    value: "3",
-    sublabel: "Items need attention",
-    icon: FaBell,
-    iconClass: "stat-icon--red",
-    alert: true,
-  },
-];
-
-const CHART_DATA = [
-  { category: "Transport", amount: 4200 },
-  { category: "Transport", amount: 6800 },
-  { category: "Transport", amount: 3100 },
-  { category: "Transport", amount: 5500 },
-  { category: "Transport", amount: 7200 },
-  { category: "Transport", amount: 4800 },
-];
-
 const CALENDAR_WEEKDAYS = ["M", "T", "W", "T", "F", "S", "S"];
-const CALENDAR_DATES = [
-  27, 28, 29, 30, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17,
-  18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 1, 2, 3, 4, 5, 6, 7,
-];
-
-const TIMELINE_EVENTS = [
-  { time: "10 Am", title: "Research", detail: "03 People" },
-  { time: "12 Pm", title: "Back end IT Asset", detail: "03 People" },
-];
 
 function formatTripDates(itinerary) {
-  if (!itinerary?.length) return "Jun 10 - Jun 15, 2026";
-  const start = new Date(itinerary[0].date);
-  const end = new Date(itinerary[itinerary.length - 1].date);
+  if (!itinerary?.length) return "—";
+  const sorted = [...itinerary].sort(
+    (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+  );
+  const start = new Date(sorted[0].date);
+  const end = new Date(sorted[sorted.length - 1].date);
   const opts = { month: "short", day: "numeric" };
   return `${start.toLocaleDateString("en-US", opts)} - ${end.toLocaleDateString("en-US", opts)}, ${start.getFullYear()}`;
 }
 
-export function DashboardMain() {
-  const trip = useSelector((state) => state.trip);
+function formatTime24to12(timeText) {
+  if (!timeText) return "—";
+  const [h, m] = String(timeText).split(":").map(Number);
+  if (!Number.isFinite(h) || !Number.isFinite(m)) return String(timeText);
+  const period = h >= 12 ? "Pm" : "Am";
+  const hour = h % 12 || 12;
+  return `${hour}:${String(m).padStart(2, "0")} ${period}`;
+}
 
-  const totalBudget = 2400;
-  const usedBudget = 1488;
-  const remainingBudget = 912;
-  const budgetPercent = Math.round((usedBudget / totalBudget) * 100);
+function buildCalendarCells(itinerary) {
+  const sorted = [...itinerary].sort(
+    (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+  );
+  const baseDate = sorted.length ? new Date(sorted[0].date) : new Date();
+  const year = baseDate.getFullYear();
+  const month = baseDate.getMonth();
 
-  const totalItems = trip.packingList.length || 60;
-  const totalPackedItems =
-    trip.packingList.filter((i) => i.packedStatus === "Packed").length || 41;
-  const displayPacked = totalPackedItems || 41;
-  const displayTotal = totalItems || 60;
+  const firstDay = new Date(year, month, 1);
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const mondayStartOffset = (firstDay.getDay() + 6) % 7;
+  const startDate = new Date(year, month, 1 - mondayStartOffset);
 
-  const budgetByCategory = [
-    "Transport",
-    "Accommodation",
-    "Food",
-    "Shopping",
-    "Activity",
-    "Other",
-  ].map((category) => {
-    const items = trip.budgetItems.filter((item) => item.category === category);
-    const total = items.reduce((sum, i) => sum + i.actualCost, 0);
-    return { category, amount: total || 0 };
+  const itineraryDays = new Set(itinerary.map((i) => i.date));
+  const cells = Array.from({ length: 42 }, (_, index) => {
+    const d = new Date(startDate);
+    d.setDate(startDate.getDate() + index);
+    const dateStr = d.toISOString().slice(0, 10);
+    return {
+      key: `${dateStr}-${index}`,
+      dayDisplay: String(d.getDate()),
+      isActive: itineraryDays.has(dateStr),
+      muted: d.getMonth() !== month,
+    };
   });
 
-  const chartData =
-    budgetByCategory.some((d) => d.amount > 0) ? budgetByCategory : CHART_DATA;
+  return {
+    monthLabel: baseDate.toLocaleDateString("en-US", {
+      month: "long",
+      year: "numeric",
+    }),
+    weekdayLabels: CALENDAR_WEEKDAYS,
+    cells,
+  };
+}
+
+export function DashboardMain() {
+  const trip = useSelector((state) => state.trip);
+  const itinerary = trip?.itinerary ?? [];
+  const packingList = trip?.packingList ?? [];
+  const budgetItems = trip?.budgetItems ?? [];
+
+  const tripNameDisplay = trip?.tripName?.trim() || "—";
+  const tripDatesDisplay = formatTripDates(itinerary);
+
+  const totalBudget = Number(trip?.budget) || 0;
+  const usedBudget = budgetItems.reduce(
+    (sum, item) => sum + (Number(item.actualCost) || 0),
+    0
+  );
+  const remainingBudget = Math.max(0, totalBudget - usedBudget);
+  const budgetPercent =
+    totalBudget > 0 ? Math.min(100, Math.round((usedBudget / totalBudget) * 100)) : 0;
+
+  const packingPacked = packingList.filter(
+    (item) => item.packedStatus === "Packed"
+  ).length;
+  const packingTotal = packingList.length;
+
+  const packingCategories = Object.entries(
+    packingList.reduce((acc, item) => {
+      const key = item.category || "Other";
+      if (!acc[key]) {
+        acc[key] = { label: key, packed: 0, total: 0 };
+      }
+      acc[key].total += 1;
+      if (item.packedStatus === "Packed") {
+        acc[key].packed += 1;
+      }
+      return acc;
+    }, {})
+  ).map(([key, value]) => ({
+    ...value,
+    percent: value.total > 0 ? Math.round((value.packed / value.total) * 100) : 0,
+    color: CATEGORY_COLORS[key] || CATEGORY_COLORS.Other,
+  }));
+
+  const budgetChart = Object.values(
+    budgetItems.reduce((acc, item) => {
+      const key = item.category || "Other";
+      if (!acc[key]) {
+        acc[key] = { category: key, amount: 0 };
+      }
+      acc[key].amount += Number(item.actualCost) || 0;
+      return acc;
+    }, {})
+  );
+
+  const itineraryDoneCount = itinerary.filter(
+    (item) => item.status === "Completed"
+  ).length;
+  const itineraryPercent =
+    itinerary.length > 0 ? Math.round((itineraryDoneCount / itinerary.length) * 100) : 0;
+
+  const packingPercent =
+    packingTotal > 0 ? Math.round((packingPacked / packingTotal) * 100) : 0;
+
+  const unpaidCount = budgetItems.filter(
+    (item) => item.paymentStatus !== "Paid"
+  ).length;
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const overdueCount = itinerary.filter((item) => {
+    const d = new Date(item.date);
+    d.setHours(0, 0, 0, 0);
+    return d < today && item.status !== "Completed";
+  }).length;
+
+  const stats = [
+    {
+      id: "itinerary",
+      label: "Itinerary",
+      sublabel: "Completed",
+      valueDisplay: `${itineraryPercent}%`,
+      progressPercent: itineraryPercent,
+      icon: "calendar",
+      alert: false,
+    },
+    {
+      id: "packing",
+      label: "Packing",
+      sublabel: "Completed",
+      valueDisplay: `${packingPercent}%`,
+      progressPercent: packingPercent,
+      icon: "clipboard",
+      alert: false,
+    },
+    {
+      id: "budget",
+      label: "Budget",
+      sublabel: "Used",
+      valueDisplay: `${budgetPercent}%`,
+      progressPercent: budgetPercent,
+      icon: "dollar",
+      alert: false,
+    },
+    {
+      id: "unpaid",
+      label: "Unpaid",
+      sublabel: "Items",
+      valueDisplay: String(unpaidCount),
+      progressPercent: Math.min(100, unpaidCount * 10),
+      icon: "tag",
+      alert: unpaidCount > 0,
+    },
+    {
+      id: "alert",
+      label: "Overdue/Alert",
+      valueDisplay: String(overdueCount),
+      progressPercent: Math.min(100, overdueCount * 20),
+      icon: "bell",
+      sublabel: overdueCount > 0 ? "Items need attention" : "All on track",
+      alert: overdueCount > 0,
+    },
+  ];
+
+  const calendar = buildCalendarCells(itinerary);
+  const timeline = [...itinerary]
+    .sort((a, b) => {
+      const left = `${a.date || ""} ${a.time || ""}`.trim();
+      const right = `${b.date || ""} ${b.time || ""}`.trim();
+      return new Date(left).getTime() - new Date(right).getTime();
+    })
+    .slice(0, 4)
+    .map((event) => ({
+      id: String(event.id),
+      time: formatTime24to12(event.time),
+      title: event.title || "Untitled",
+      detail: event.location || event.category || "",
+    }));
+
+  const showChart = budgetChart.length > 0;
 
   return (
     <div className="dashboard-main">
@@ -148,10 +326,11 @@ export function DashboardMain() {
         </div>
         <div className="trip-summary-card">
           <div className="trip-summary-card__content">
-            <h2 className="trip-summary-card__name">Hachimi</h2>
+            {/* Dữ liệu lấy từ Redux state (được hydrate từ localStorage key `tripData`). */}
+            <h2 className="trip-summary-card__name">{tripNameDisplay}</h2>
             <p className="trip-summary-card__dates">
               <FiCalendar aria-hidden />
-              {formatTripDates(trip.itinerary)}
+              {tripDatesDisplay}
             </p>
             <button type="button" className="btn-view-itinerary">
               View Itinerary
@@ -171,26 +350,48 @@ export function DashboardMain() {
       </header>
 
       <div className="stats-cards">
-        {STAT_CARDS.map((card) => {
-          const Icon = card.icon;
-          return (
-            <div
-              key={card.label}
-              className={`stat-card${card.alert ? " stat-card--alert" : ""}`}
-            >
-              <span className={`stat-icon ${card.iconClass}`}>
-                <Icon />
-              </span>
-              <p className={`stat-value${card.alert ? " stat-value--alert" : ""}`}>
-                {card.value}
-              </p>
-              <p className="stat-label">{card.label}</p>
-              {card.sublabel && (
-                <p className="stat-sublabel">{card.sublabel}</p>
-              )}
-            </div>
-          );
-        })}
+        {stats.length === 0 ? (
+          <p className="dashboard-empty-inline">
+            Chưa có thẻ thống kê. Hãy kiểm tra dữ liệu trong <code>localStorage.tripData</code>.
+          </p>
+        ) : (
+          stats.map((card) => {
+            const Icon =
+              STAT_ICON_COMPONENTS[card.icon] ?? STAT_ICON_COMPONENTS.calendar;
+            const visual = STAT_VISUAL_BY_ICON[card.icon] ?? DEFAULT_STAT_VISUAL;
+            return (
+              <div
+                key={card.id}
+                className={`stat-card${card.alert ? " stat-card--alert" : ""}`}
+              >
+                <span className={`stat-icon ${visual.iconClass}`}>
+                  <Icon aria-hidden />
+                </span>
+                <StatProgressRing
+                  percent={card.progressPercent}
+                  ringColor={visual.ring}
+                  alert={card.alert}
+                >
+                  <p
+                    className={`stat-value${card.alert ? " stat-value--alert" : ""}`}
+                  >
+                    {card.valueDisplay}
+                  </p>
+                </StatProgressRing>
+                <p className={`stat-label${card.alert ? " stat-label--alert" : ""}`}>
+                  {card.label}
+                </p>
+                {card.sublabel ? (
+                  <p
+                    className={`stat-sublabel${card.alert ? " stat-sublabel--alert" : ""}`}
+                  >
+                    {card.sublabel}
+                  </p>
+                ) : null}
+              </div>
+            );
+          })
+        )}
       </div>
 
       <div className="dashboard-grid">
@@ -202,76 +403,74 @@ export function DashboardMain() {
                 See all items →
               </a>
             </div>
+            {/* note : Packing hiển thị theo `tripData.packingList` trong localStorage. */}
             <p className="packed-summary">
               Packed{" "}
               <strong>
-                {displayPacked} of {displayTotal} items ready
+                {packingPacked} of {packingTotal} items ready
               </strong>
             </p>
-            {PACKING_CATEGORIES.map((category) => {
-              const itemsInCategory = trip.packingList.filter(
-                (i) => i.category === category
-              );
-              const packedCount = itemsInCategory.filter(
-                (i) => i.packedStatus === "Packed"
-              ).length;
-              const totalCount = itemsInCategory.length || 1;
-              const percent =
-                itemsInCategory.length === 0
-                  ? { Clothes: 80, Documents: 60, Electronics: 50, Personal: 70 }[
-                      category
-                    ]
-                  : Math.round((packedCount / totalCount) * 100);
-
-              return (
-                <div key={category} className="category-progress">
+            {packingCategories.length === 0 ? (
+              <p className="dashboard-empty-block">
+                Chưa có danh mục — bổ sung item trong <code>tripData.packingList</code>.
+              </p>
+            ) : (
+              packingCategories.map((cat) => (
+                <div key={cat.label} className="category-progress">
                   <div className="category-header">
-                    <span className="category-name">{category}</span>
-                    <span className="category-percent">{percent}%</span>
+                    <span className="category-name">{cat.label}</span>
+                    <span className="category-percent">{cat.percent}%</span>
                   </div>
                   <div className="progress-bar">
                     <div
                       className="progress-fill"
                       style={{
-                        width: `${percent}%`,
-                        backgroundColor: CATEGORY_COLORS[category],
+                        width: `${cat.percent}%`,
+                        backgroundColor: cat.color,
                       }}
                     />
                   </div>
                 </div>
-              );
-            })}
+              ))
+            )}
           </div>
 
           <div className="card budget-chart">
             <h2>Budget by Categories</h2>
-            <ResponsiveContainer width="100%" height={280}>
-              <BarChart
-                data={chartData}
-                margin={{ top: 12, right: 12, left: 0, bottom: 8 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
-                <XAxis
-                  dataKey="category"
-                  tick={{ fontSize: 11, fill: "#6B7280" }}
-                  axisLine={false}
-                  tickLine={false}
-                />
-                <YAxis
-                  tick={{ fontSize: 11, fill: "#6B7280" }}
-                  axisLine={false}
-                  tickLine={false}
-                  tickFormatter={(v) => `$${v}`}
-                />
-                <Tooltip formatter={(value) => `$${value}`} />
-                <Legend
-                  verticalAlign="bottom"
-                  iconType="square"
-                  formatter={() => "revenue"}
-                />
-                <Bar dataKey="amount" fill="#76A1C9" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
+            {/* NOTE: Budget chart lấy từ `tripData.budgetItems[*].actualCost` theo category. */}
+            {showChart ? (
+              <ResponsiveContainer width="100%" height={280}>
+                <BarChart
+                  data={budgetChart}
+                  margin={{ top: 12, right: 12, left: 0, bottom: 8 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
+                  <XAxis
+                    dataKey="category"
+                    tick={{ fontSize: 11, fill: "#6B7280" }}
+                    axisLine={false}
+                    tickLine={false}
+                  />
+                  <YAxis
+                    tick={{ fontSize: 11, fill: "#6B7280" }}
+                    axisLine={false}
+                    tickLine={false}
+                    tickFormatter={(v) => `$${v}`}
+                  />
+                  <Tooltip formatter={(value) => `$${value}`} />
+                  <Legend
+                    verticalAlign="bottom"
+                    iconType="square"
+                    formatter={() => "revenue"}
+                  />
+                  <Bar dataKey="amount" fill="#76A1C9" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <p className="dashboard-empty-block">
+                Chưa có dữ liệu biểu đồ — bổ sung <code>tripData.budgetItems</code>.
+              </p>
+            )}
           </div>
 
           <div className="card budget-overview">
@@ -281,6 +480,7 @@ export function DashboardMain() {
               </span>
               <h2>Budget Overview</h2>
             </div>
+            {/* NOTE: overview lấy từ `tripData.budget` và tổng actualCost của budgetItems. */}
             <div className="budget-summary">
               <div className="budget-summary-item">
                 <span className="budget-summary-label">Total Budget</span>
@@ -322,38 +522,59 @@ export function DashboardMain() {
               <button type="button" className="calendar-nav" aria-label="Previous month">
                 <FiChevronLeft />
               </button>
-              <h2>2024 December</h2>
+              {/* NOTE: calendar dựng tự động theo tháng của itinerary sớm nhất trong localStorage. */}
+              <h2>{calendar.monthLabel.trim() || "—"}</h2>
               <button type="button" className="calendar-nav" aria-label="Next month">
                 <FiChevronRight />
               </button>
             </div>
-            <div className="calendar-weekdays">
-              {CALENDAR_WEEKDAYS.map((day, i) => (
-                <span key={`${day}-${i}`}>{day}</span>
-              ))}
-            </div>
-            <div className="calendar-dates">
-              {CALENDAR_DATES.map((date, i) => (
-                <span
-                  key={`${date}-${i}`}
-                  className={date === 3 && i > 6 ? "calendar-date--active" : ""}
-                >
-                  {date}
-                </span>
-              ))}
-            </div>
+            {calendar.weekdayLabels.length === 0 ? (
+              <p className="dashboard-empty-block">
+                Không có dữ liệu lịch. Hãy thêm <code>tripData.itinerary</code>.
+              </p>
+            ) : (
+              <>
+                <div className="calendar-weekdays">
+                  {calendar.weekdayLabels.map((day, i) => (
+                    <span key={`${day}-${i}`}>{day}</span>
+                  ))}
+                </div>
+                <div className="calendar-dates">
+                  {calendar.cells.map((cell) => (
+                    <span
+                      key={cell.key}
+                      className={[
+                        cell.isActive ? "calendar-date--active" : "",
+                        cell.muted ? "calendar-date--muted" : "",
+                      ]
+                        .filter(Boolean)
+                        .join(" ")}
+                    >
+                      {cell.dayDisplay}
+                    </span>
+                  ))}
+                </div>
+              </>
+            )}
           </div>
 
           <div className="card day-timeline">
-            {TIMELINE_EVENTS.map((event) => (
-              <div key={event.time} className="timeline-event">
-                <span className="timeline-time">{event.time}</span>
-                <div className="timeline-block">
-                  <p className="timeline-title">{event.title}</p>
-                  <p className="timeline-detail">{event.detail}</p>
+            {/* NOTE: timeline lấy 4 itinerary event đầu theo date/time. */}
+            {timeline.length === 0 ? (
+              <p className="dashboard-empty-block">
+                Chưa có sự kiện — bổ sung <code>tripData.itinerary</code>.
+              </p>
+            ) : (
+              timeline.map((event) => (
+                <div key={event.id} className="timeline-event">
+                  <span className="timeline-time">{event.time}</span>
+                  <div className="timeline-block">
+                    <p className="timeline-title">{event.title}</p>
+                    <p className="timeline-detail">{event.detail}</p>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </div>
       </div>
