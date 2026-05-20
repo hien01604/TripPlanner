@@ -1,3 +1,33 @@
+/* inter-vietnamese-wght-normal */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400;
+  src: url('./assets/fonts/inter-vietnamese-400-normal.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 600;
+  src: url('./assets/fonts/inter-vietnamese-600-normal.woff2') format('woff2');
+}
+
+html,
+body, 
+#root {
+  font-family: 'Inter', sans-serif;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
 .app-layout{
   display:flex;
 
@@ -51,3 +81,4 @@
 
   overflow-y:auto;
 }
+
