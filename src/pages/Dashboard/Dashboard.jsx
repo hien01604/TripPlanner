@@ -149,7 +149,7 @@ function buildCalendarCells(itinerary) {
   const month = baseDate.getMonth();
 
   const firstDay = new Date(year, month, 1);
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  // const daysInMonth = new Date(year, month + 1, 0).getDate();
   const mondayStartOffset = (firstDay.getDay() + 6) % 7;
   const startDate = new Date(year, month, 1 - mondayStartOffset);
 
@@ -193,40 +193,68 @@ export function DashboardMain() {
   const remainingBudget = Math.max(0, totalBudget - usedBudget);
   const budgetPercent =
     totalBudget > 0 ? Math.min(100, Math.round((usedBudget / totalBudget) * 100)) : 0;
+  const defaultCategoryPacking = [
+    "Clothes",
+    "Documents",
+    "Electronics",
+    "Medicine",
+    "Personal",
+    "Other",
+  ];
+// Tính packingPacked và packingTotal
+const packingPacked = packingList.filter(
+  (item) => item.packedStatus === "Packed"
+).length;
+const packingTotal = packingList.length;
 
-  const packingPacked = packingList.filter(
-    (item) => item.packedStatus === "Packed"
-  ).length;
-  const packingTotal = packingList.length;
+// Tạo rawCategories từ packingList
+const rawCategories = Object.values(
+  packingList.reduce((acc, item) => {
+    const key = item.category || "Other";
+    if (!acc[key]) {
+      acc[key] = { label: key, packed: 0, total: 0 };
+    }
+    acc[key].total += 1;
+    if (item.packedStatus === "Packed") {
+      acc[key].packed += 1;
+    }
+    return acc;
+  }, {})
+);
+// Merge với category mặc định để luôn hiển thị
+const packingCategories = defaultCategoryPacking.map((label) => {
+  const found = rawCategories.find((c) => c.label === label);
+  return found
+    ? {
+        label,
+        percent: Math.round((found.packed / found.total) * 100),
+        packed: found.packed,
+        total: found.total,
+        color: CATEGORY_COLORS[label] || "#d1d5db",
+      }
+    : {
+        label,
+        percent: 0,
+        packed: 0,
+        total: 0,
+        color: "#3498db",
+      };
+});
 
-  const packingCategories = Object.entries(
-    packingList.reduce((acc, item) => {
-      const key = item.category || "Other";
-      if (!acc[key]) {
-        acc[key] = { label: key, packed: 0, total: 0 };
-      }
-      acc[key].total += 1;
-      if (item.packedStatus === "Packed") {
-        acc[key].packed += 1;
-      }
-      return acc;
-    }, {})
-  ).map(([key, value]) => ({
-    ...value,
-    percent: value.total > 0 ? Math.round((value.packed / value.total) * 100) : 0,
-    color: CATEGORY_COLORS[key] || CATEGORY_COLORS.Other,
-  }));
+  const defaultBudgetCategories = [
+    "Transport",
+    "Accommodation",
+    "Food",
+    "Shopping",
+    "Activity",
+    "Other",
+  ];
 
-  const budgetChart = Object.values(
-    budgetItems.reduce((acc, item) => {
-      const key = item.category || "Other";
-      if (!acc[key]) {
-        acc[key] = { category: key, amount: 0 };
-      }
-      acc[key].amount += Number(item.actualCost) || 0;
-      return acc;
-    }, {})
-  );
+  const budgetChart = defaultBudgetCategories.map(label => {
+    const found = budgetItems.filter(item => item.category === label);
+    const amount = found.reduce((sum, item) => sum + (Number(item.actualCost) || 0), 0);
+    return { category: label, amount };
+  });
 
   const itineraryDoneCount = itinerary.filter(
     (item) => item.status === "Completed"
@@ -398,81 +426,81 @@ export function DashboardMain() {
         <div className="dashboard-grid__left">
           <div className="card packing-progress">
             <div className="card-header">
+                <div className="header-left">
+              <span className="stat-icon stat-icon--teal">
+                <FaClipboardList />
+              </span>
               <h2>Packing Progress</h2>
+              </div>
               <a href="#packing" className="link-teal">
                 See all items →
               </a>
             </div>
             {/* note : Packing hiển thị theo `tripData.packingList` trong localStorage. */}
             <p className="packed-summary">
-              Packed{" "}
               <strong>
-                {packingPacked} of {packingTotal} items ready
+              Packed{" "}
               </strong>
+              <diV>
+                {packingPacked} of {packingTotal} items ready
+
+              </diV>
             </p>
-            {packingCategories.length === 0 ? (
-              <p className="dashboard-empty-block">
-                Chưa có danh mục — bổ sung item trong <code>tripData.packingList</code>.
-              </p>
-            ) : (
-              packingCategories.map((cat) => (
-                <div key={cat.label} className="category-progress">
-                  <div className="category-header">
-                    <span className="category-name">{cat.label}</span>
-                    <span className="category-percent">{cat.percent}%</span>
-                  </div>
-                  <div className="progress-bar">
-                    <div
-                      className="progress-fill"
-                      style={{
-                        width: `${cat.percent}%`,
-                        backgroundColor: cat.color,
-                      }}
-                    />
-                  </div>
+            {packingCategories.map((cat) => (
+              <div key={cat.label} className="category-progress">
+                <div className="category-header">
+                  <span className="category-name">{cat.label}</span>
+                  <span className="category-percent">{cat.percent}%</span>
                 </div>
-              ))
-            )}
+                <div className="progress-bar">
+                  <div
+                    className="progress-fill"
+                    style={{
+                      width: `${cat.percent}%`,
+                      backgroundColor: cat.color,
+                    }}
+                  />
+                </div>
+              </div>
+            ))}
           </div>
 
           <div className="card budget-chart">
-            <h2>Budget by Categories</h2>
-            {/* NOTE: Budget chart lấy từ `tripData.budgetItems[*].actualCost` theo category. */}
-            {showChart ? (
-              <ResponsiveContainer width="100%" height={280}>
-                <BarChart
-                  data={budgetChart}
-                  margin={{ top: 12, right: 12, left: 0, bottom: 8 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
-                  <XAxis
-                    dataKey="category"
-                    tick={{ fontSize: 11, fill: "#6B7280" }}
-                    axisLine={false}
-                    tickLine={false}
-                  />
-                  <YAxis
-                    tick={{ fontSize: 11, fill: "#6B7280" }}
-                    axisLine={false}
-                    tickLine={false}
-                    tickFormatter={(v) => `$${v}`}
-                  />
-                  <Tooltip formatter={(value) => `$${value}`} />
-                  <Legend
-                    verticalAlign="bottom"
-                    iconType="square"
-                    formatter={() => "revenue"}
-                  />
-                  <Bar dataKey="amount" fill="#76A1C9" radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            ) : (
-              <p className="dashboard-empty-block">
-                Chưa có dữ liệu biểu đồ — bổ sung <code>tripData.budgetItems</code>.
-              </p>
-            )}
+                <h2>Budget by Categories</h2>
+                {showChart ? (
+                  <ResponsiveContainer width="100%" height={280}>
+                    <BarChart
+                      data={budgetChart}
+                      margin={{ top: 12, right: 12, left: 0, bottom: 8 }}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
+                      <XAxis
+                        dataKey="category"
+                        tick={{ fontSize: 11, fill: "#6B7280" }}
+                        axisLine={false}
+                        tickLine={false}
+                      />
+                      <YAxis
+                        tick={{ fontSize: 11, fill: "#6B7280" }}
+                        axisLine={false}
+                        tickLine={false}
+                        tickFormatter={v => `$${v}`}
+                      />
+                      <Tooltip formatter={value => `$${value}`} />
+                      <Legend
+                        verticalAlign="bottom"
+                        iconType="square"
+                        formatter={() => "amount"}
+                      />
+                      <Bar dataKey="amount" fill="#76A1C9" radius={[4, 4, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <p className="dashboard-empty-block">
+                    Chưa có dữ liệu biểu đồ — bổ sung <code>tripData.budgetItems</code>.
+                  </p>
+                )}
           </div>
-
           <div className="card budget-overview">
             <div className="budget-overview-header">
               <span className="budget-overview-icon">

@@ -85,7 +85,7 @@ const initialState = savedTrip || {
       category: "Documents",
       quantity: 1,
       requiredStatus: "Required",
-      packedStatus: "Not Packed"
+      packedStatus: "Packed"
     },
     {
       id: 2,
@@ -172,7 +172,7 @@ const initialState = savedTrip || {
     {
       id: 4,
       name: "Sightseeing & Tickets",
-      category: "Entertainment",
+      category: "Activity",
       estimatedCost: 1500000,
       actualCost: 1600000,
       paymentStatus: "Paid"

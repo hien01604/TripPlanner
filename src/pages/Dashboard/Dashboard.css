@@ -6,7 +6,7 @@
   flex-direction: column;
   height: 100vh;
   font-family: "Inter", system-ui, sans-serif;
-  background: #f4f6f8;
+  background-color: #fff;
   overflow: hidden;
 }
 
@@ -147,6 +147,7 @@
   flex: 1;
   min-height: 0;
   overflow: hidden;
+  
 }
 
 .dashboard-body .sidebar,
@@ -159,12 +160,13 @@
   flex: 1;
   overflow-y: auto;
   padding: 24px 28px;
-  background: #f4f6f8;
+  background-color: #fff;
 }
 
 /* Main dashboard content */
 .dashboard-main {
   max-width: 1200px;
+  background-color: #fff;
 }
 
 .dashboard-page-header {
@@ -174,8 +176,9 @@
   gap: 20px;
   margin-bottom: 24px;
   flex-wrap: wrap;
+  border-bottom: 2px solid rgba(121, 121, 121, 0.14);
+  padding-bottom: 20px;
 }
-
 .dashboard-page-header__left .breadcrumb {
   font-size: 12px;
   color: #6b7280;
@@ -187,6 +190,7 @@
   font-weight: 700;
   color: #111827;
   margin: 0 0 4px;
+  padding-top: 20px;
 }
 
 .dashboard-subtitle {
@@ -204,7 +208,6 @@
   background: #fff;
   border-radius: 14px;
   border: 1px solid rgba(121, 121, 121, 0.12);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
   overflow: hidden;
 }
 
@@ -308,7 +311,6 @@
   padding: 14px 10px 16px;
   text-align: center;
   border: 1px solid rgba(121, 121, 121, 0.12);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -527,7 +529,6 @@
   padding: 18px;
   border-radius: 12px;
   border: 1px solid rgba(121, 121, 121, 0.12);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 .card h2 {
@@ -537,20 +538,26 @@
   margin: 0 0 12px;
 }
 
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
-}
+.card-header { 
+  display: flex; 
+  justify-content: space-between; 
+  align-items: center; 
+  margin-bottom: 8px; 
+  padding-bottom: 20px;
 
+}
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 .card-header h2 {
   margin: 0;
 }
 
 .link-teal {
   font-size: 13px;
-  color: #4fd1c5;
+  color: #0968DA;
   text-decoration: none;
   font-weight: 500;
 }
@@ -560,9 +567,14 @@
 }
 
 .packed-summary {
-  font-size: 14px;
+  font-size: 15px;
   color: #374151;
   margin: 0 0 16px;
+  padding: 10px;
+
+}
+.packed-summary strong {
+  font-size: 20px;
 }
 
 .packed-summary strong {
