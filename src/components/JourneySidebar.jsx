@@ -1,37 +1,33 @@
-import { FaPlus } from "react-icons/fa"
-import { HiOutlineDotsVertical } from "react-icons/hi"
+import { useSelector } from "react-redux";
+import { FaPlus } from "react-icons/fa";
+import { HiOutlineDotsVertical } from "react-icons/hi";
+import "../style/JourneySidebar.css";
 
-import journeys from "../data/journeys"
-import "../style/JourneySidebar.css"
+function JourneySidebar({ selectedTripIndex = 0, setSelectedTripIndex }) {
+  const trips = useSelector((state) => state.trip.trips ?? []);
 
-function JourneySidebar() {
   return (
     <div className="sidebar">
       <h3 className="sidebar-title">JOURNEY</h3>
-
-      <input
-        className="search-input"
-        placeholder="Find journey"
-      />
-
+      <input className="search-input" placeholder="Find journey" />
       <div className="journey-list">
-        {journeys.map((journey) => (
+        {trips.map((trip, index) => (
           <div
-            key={journey.id}
-            className={`journey-item${journey.id === 1 ? " active" : ""}`}
+            key={index}
+            className={`journey-item${index === selectedTripIndex ? " active" : ""}`}
+            onClick={() => setSelectedTripIndex(index)}
           >
-            <span>{journey.name}</span>
+            <span>{trip.tripName}</span>
             <HiOutlineDotsVertical />
           </div>
         ))}
       </div>
-
       <button className="create-btn">
         <FaPlus />
         Create new journey
       </button>
     </div>
-  )
+  );
 }
 
-export default JourneySidebar
+export default JourneySidebar;

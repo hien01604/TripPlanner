@@ -1,8 +1,7 @@
 .app-layout{
   display:flex;
-
+  background-color: #FFFFFF;
   height:100vh;
-
   overflow:hidden;
 }
 
@@ -46,8 +45,5 @@
 
 .main-content{
   flex:1;
-
-  padding:30px;
-
   overflow-y:auto;
 }
