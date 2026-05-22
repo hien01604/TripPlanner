@@ -98,6 +98,22 @@ const tripSlice = createSlice({
   name: "trip",
   initialState,
   reducers: {
+    addTrip: (state, action) => {
+      state.trips.push(action.payload);
+      localStorage.setItem("tripData", JSON.stringify(state));
+    },
+
+    updateTrip: (state, action) => {
+      const { index, trip } = action.payload;
+
+      if (index < 0 || index >= state.trips.length) {
+        return;
+      }
+
+      state.trips[index] = trip;
+      localStorage.setItem("tripData", JSON.stringify(state));
+    },
+
     updateItinerary: (state, action) => {
       state.trips = action.payload;
       localStorage.setItem("tripData", JSON.stringify(state));
@@ -114,5 +130,5 @@ const tripSlice = createSlice({
   }
 });
 
-export const { updateItinerary, markPackingItemPacked } = tripSlice.actions;
+export const { addTrip, updateTrip, updateItinerary, markPackingItemPacked } = tripSlice.actions;
 export default tripSlice.reducer;
