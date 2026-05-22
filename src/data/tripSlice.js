@@ -102,17 +102,38 @@ const tripSlice = createSlice({
       state.trips = action.payload;
       localStorage.setItem("tripData", JSON.stringify(state));
     },
-    markPackingItemPacked: (state, action) => {
-      const tripIndex = action.payload.tripIndex;
-      const itemId = action.payload.itemId;
-      const updatedList = state.trips[tripIndex].packingList.map(item =>
-        item.id === itemId ? { ...item, packedStatus: "Packed" } : item
-      );
-      state.trips[tripIndex].packingList = updatedList;
-      localStorage.setItem("tripData", JSON.stringify(state));
-    }
+    togglePackingItem: (state, action) => {
+      const { tripIndex, itemId } = action.payload
+      const list = state.trips[tripIndex].packingList
+      const item = list.find(i => i.id === itemId)
+      if (item) item.packedStatus = item.packedStatus === "Packed" ? "Not Packed" : "Packed"
+      localStorage.setItem("tripData", JSON.stringify(state))
+    },
+    addPackingItem: (state, action) => {
+      const { tripIndex, item } = action.payload
+      state.trips[tripIndex].packingList.push(item)
+      localStorage.setItem("tripData", JSON.stringify(state))
+    },
+    deletePackingItem: (state, action) => {
+      const { tripIndex, itemId } = action.payload
+      const list = state.trips[tripIndex].packingList
+      state.trips[tripIndex].packingList = list.filter(i => i.id !== itemId)
+      localStorage.setItem("tripData", JSON.stringify(state))
+    },
+    updatePackingItem: (state, action) => {
+      const { tripIndex, item } = action.payload
+      const list = state.trips[tripIndex].packingList
+      const idx = list.findIndex(i => i.id === item.id)
+      if (idx !== -1) list[idx] = item
+      localStorage.setItem("tripData", JSON.stringify(state))
+    },
   }
 });
 
-export const { updateItinerary, markPackingItemPacked } = tripSlice.actions;
+export const { 
+  updateItinerary, 
+  togglePackingItem,
+  addPackingItem,
+  deletePackingItem,
+  updatePackingItem, } = tripSlice.actions;
 export default tripSlice.reducer;
