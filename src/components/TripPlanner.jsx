@@ -82,20 +82,39 @@ function TripPlanner({
         />
 
         <main className="dashboard-content">
-          {selectedPage === "Dashboard" && <Dashboard selectedTripIndex={selectedTripIndex} />}
-          {selectedPage === "JourneyManagement" && (
-            <JourneyManagement
-              selectedTripIndex={selectedTripIndex}
-              setSelectedTripIndex={setSelectedTripIndex}
-              setSelectedPage={setSelectedPage}
-              journeyManagementAction={journeyManagementAction}
-              setJourneyManagementAction={setJourneyManagementAction}
-            />
-          )}
-          {selectedPage === "Itinerary" && <Itinerary currentTripIndex={selectedTripIndex} />}
-          {selectedPage === "Packing" && <Packing currentTripIndex={selectedTripIndex} />}
-          {selectedPage === "Budget" && <Budget currentTripIndex={selectedTripIndex} />}
+  {selectedPage === "Dashboard" && (
+    <Dashboard selectedTripIndex={selectedTripIndex} />
+  )}
+
+  {selectedPage === "JourneyManagement" && (
+    <JourneyManagement
+      selectedTripIndex={selectedTripIndex}
+      setSelectedTripIndex={setSelectedTripIndex}
+      setSelectedPage={setSelectedPage}
+      journeyManagementAction={journeyManagementAction}
+      setJourneyManagementAction={setJourneyManagementAction}
+    />
+  )}
+
+  {selectedPage === "Itinerary" && (
+    <Itinerary selectedTripIndex={selectedTripIndex} />
+  )}
+
+  {selectedPage === "Packing" && (
+    <Packing selectedTripIndex={selectedTripIndex} />
+  )}
+
+  {selectedPage === "Budget" && (
+    <Budget selectedTripIndex={selectedTripIndex} />
+  )}
+</main>Page === "Budget" && <Budget currentTripIndex={selectedTripIndex} />}
         </main>
+    <main className="dashboard-content">
+      {selectedPage === "Dashboard" && <Dashboard selectedTripIndex={selectedTripIndex} />}
+      {selectedPage === "Itinerary" && <Itinerary selectedTripIndex={selectedTripIndex} />}
+      {selectedPage === "Packing" && <Packing selectedTripIndex={selectedTripIndex} />}
+      {selectedPage === "Budget" && <Budget selectedTripIndex={selectedTripIndex} />}
+    </main>
       </div>
     </div>
   );

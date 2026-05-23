@@ -1,0 +1,26 @@
+.filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 30px;
+}
+
+.search-input2 {
+  flex: 1;
+  padding: 14px 18px;
+  border: none;
+  border-radius: 12px;
+  background: white;
+  font-size: 15px;
+  outline: none;
+}
+
+.filter-select {
+  padding: 14px 18px;
+  border: none;
+  border-radius: 12px;
+  background: white;
+  font-size: 15px;
+  outline: none;
+  cursor: pointer;
+}
