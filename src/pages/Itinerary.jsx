@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import ActivityModal from "../components/itinerary/ActivityModal";
 import ActivityTimeline from "../components/itinerary/ActivityTimeline";
 import DaySection from "../components/itinerary/DaySection";
@@ -13,26 +14,21 @@ import {
   getMonthFromDate,
   getTimeInMinutes,
   LAST_MODIFIED_KEY,
-  STORAGE_KEY,
 } from "../data/itineraryUtils";
 import "../style/Itinerary.css";
+import {
+  changeActivityStatus,
+  deleteActivity,
+  saveActivity,
+} from "../data/tripSlice";
 
 const Itinerary = () => {
   const todayDate = formatLocalDate(new Date());
-
-  const [activities, setActivities] = useState(() => {
-    const savedActivities = localStorage.getItem(STORAGE_KEY);
-
-    if (!savedActivities) {
-      return [];
-    }
-
-    try {
-      return JSON.parse(savedActivities);
-    } catch {
-      return [];
-    }
-  });
+  const dispatch = useDispatch();
+  const selectedTripIndex = 0;
+  const activities = useSelector(
+    (state) => state.trip.trips[selectedTripIndex]?.itinerary || []
+  );
 
   const [lastModified, setLastModified] = useState(() => {
     return localStorage.getItem(LAST_MODIFIED_KEY) || new Date().toISOString();
@@ -50,10 +46,6 @@ const Itinerary = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingActivity, setEditingActivity] = useState(null);
   const [form, setForm] = useState(emptyForm);
-
-  useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(activities));
-  }, [activities]);
 
   const days = useMemo(() => getDaysInMonth(filters.month), [filters.month]);
 
@@ -116,21 +108,19 @@ const Itinerary = () => {
     event.preventDefault();
 
     if (editingActivity) {
-      setActivities((prev) =>
-        prev.map((activity) =>
-          activity.id === editingActivity.id
-            ? { ...form, id: editingActivity.id }
-            : activity
-        )
+      dispatch(
+        saveActivity({
+          tripIndex: selectedTripIndex,
+          activity: { ...form, id: editingActivity.id },
+        })
       );
     } else {
-      setActivities((prev) => [
-        ...prev,
-        {
-          ...form,
-          id: Date.now(),
-        },
-      ]);
+      dispatch(
+        saveActivity({
+          tripIndex: selectedTripIndex,
+          activity: form,
+        })
+      );
     }
 
     setFilters((prev) => ({
@@ -147,30 +137,22 @@ const Itinerary = () => {
     const confirmed = window.confirm("Delete this itinerary item?");
     if (!confirmed) return;
 
-    setActivities((prev) =>
-      prev.filter((activity) => activity.id !== activityId)
+    dispatch(
+      deleteActivity({
+        tripIndex: selectedTripIndex,
+        activityId,
+      })
     );
-
     updateLastModified();
   };
 
   const handleChangeStatus = (activityId) => {
-    const statusFlow = ["Planned", "In Progress", "Done"];
-
-    setActivities((prev) =>
-      prev.map((activity) => {
-        if (activity.id !== activityId) return activity;
-
-        const currentIndex = statusFlow.indexOf(activity.status);
-        const nextStatus = statusFlow[(currentIndex + 1) % statusFlow.length];
-
-        return {
-          ...activity,
-          status: nextStatus,
-        };
+    dispatch(
+      changeActivityStatus({
+        tripIndex: selectedTripIndex,
+        activityId,
       })
     );
-
     updateLastModified();
   };
 
