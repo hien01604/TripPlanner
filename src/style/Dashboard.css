@@ -42,7 +42,7 @@
   .stats-cards { grid-template-columns: repeat(3, 1fr); }
   .bottom-section { grid-template-columns: repeat(3, 1fr); }
 }
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+/* @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"); */
 
 /* Shell */
 .dashboard-shell {

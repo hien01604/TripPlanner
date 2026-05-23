@@ -1,3 +1,15 @@
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 100 700;
+  font-display: swap;
+  src: url('./assets/fonts/Inter-VariableFont_opsz,wght.ttf') format('truetype');
+}
+
+body {
+  font-family: 'Inter', Arial, sans-serif;
+}
+
 .app-layout{
   display:flex;
   background-color: #FFFFFF;

@@ -166,7 +166,7 @@ function buildCalendarCells(itinerary) {
   };
 }
 
-function Dashboard({ selectedTripIndex = 0 }) {
+function Dashboard({ selectedTripIndex = 0, setSelectedPage }) {
   const trips = useSelector(state => state.trip.trips ?? []);
   const trip = trips[selectedTripIndex] || {};
   
@@ -433,9 +433,9 @@ const packingCategories = defaultCategoryPacking.map((label) => {
               <strong>
                 Packed{" "}
               </strong>
-              <diV>
+              <div>
                 {packingPacked} of {packingTotal} items ready
-              </diV>
+              </div>
             </p>
             {packingCategories.map((cat) => (
               <div key={cat.label} className="category-progress">
@@ -526,7 +526,7 @@ const packingCategories = defaultCategoryPacking.map((label) => {
                 style={{ width: `${budgetPercent}%` }}
               />
             </div>
-            <button type="button" className="btn-view-budget">
+            <button type="button" className="btn-view-budget" onClick={() => setSelectedPage("Budget")}>
               View Budget Details
               <span className="btn-arrow" aria-hidden>
                 →

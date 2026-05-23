@@ -97,32 +97,35 @@ function TripPlanner({
         )}
 
         <main className="dashboard-content">
-          {selectedPage === "Dashboard" && (
-            <Dashboard selectedTripIndex={selectedTripIndex} />
-          )}
+  {selectedPage === "Dashboard" && (
+    <Dashboard
+      selectedTripIndex={selectedTripIndex}
+      setSelectedPage={handleSetSelectedPage}
+    />
+  )}
 
-          {selectedPage === "JourneyManagement" && (
-            <JourneyManagement
-              selectedTripIndex={selectedTripIndex}
-              setSelectedTripIndex={setSelectedTripIndex}
-              setSelectedPage={handleSetSelectedPage}
-              journeyManagementAction={journeyManagementAction}
-              setJourneyManagementAction={setJourneyManagementAction}
-            />
-          )}
+  {selectedPage === "JourneyManagement" && (
+    <JourneyManagement
+      selectedTripIndex={selectedTripIndex}
+      setSelectedTripIndex={setSelectedTripIndex}
+      setSelectedPage={handleSetSelectedPage}
+      journeyManagementAction={journeyManagementAction}
+      setJourneyManagementAction={setJourneyManagementAction}
+    />
+  )}
 
-          {selectedPage === "Itinerary" && (
-            <Itinerary selectedTripIndex={selectedTripIndex} />
-          )}
+  {selectedPage === "Itinerary" && (
+    <Itinerary selectedTripIndex={selectedTripIndex} />
+  )}
 
-          {selectedPage === "Packing" && (
-            <Packing selectedTripIndex={selectedTripIndex} />
-          )}
+  {selectedPage === "Packing" && (
+    <Packing selectedTripIndex={selectedTripIndex} />
+  )}
 
-          {selectedPage === "Budget" && (
-            <Budget selectedTripIndex={selectedTripIndex} />
-          )}
-        </main>
+  {selectedPage === "Budget" && (
+    <Budget selectedTripIndex={selectedTripIndex} />
+  )}
+</main>
       </div>
     </div>
   );
