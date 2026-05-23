@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import ActivityModal from "../components/itinerary/ActivityModal";
 import ActivityTimeline from "../components/itinerary/ActivityTimeline";
 import DaySection from "../components/itinerary/DaySection";
@@ -16,27 +17,19 @@ import {
   STORAGE_KEY,
 } from "../data/itineraryUtils";
 import "../style/Itinerary.css";
+import {
+  changeActivityStatus,
+  deleteActivity,
+  saveActivity,
+  selectActivities,
+  selectLastModified,
+} from "../store/itinerarySlice";
 
 const Itinerary = () => {
   const todayDate = formatLocalDate(new Date());
-
-  const [activities, setActivities] = useState(() => {
-    const savedActivities = localStorage.getItem(STORAGE_KEY);
-
-    if (!savedActivities) {
-      return [];
-    }
-
-    try {
-      return JSON.parse(savedActivities);
-    } catch {
-      return [];
-    }
-  });
-
-  const [lastModified, setLastModified] = useState(() => {
-    return localStorage.getItem(LAST_MODIFIED_KEY) || new Date().toISOString();
-  });
+  const dispatch = useDispatch();
+  const activities = useSelector(selectActivities);
+  const lastModified = useSelector(selectLastModified);
 
   const [selectedDate, setSelectedDate] = useState(todayDate);
 
@@ -55,6 +48,10 @@ const Itinerary = () => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(activities));
   }, [activities]);
 
+  useEffect(() => {
+    localStorage.setItem(LAST_MODIFIED_KEY, lastModified);
+  }, [lastModified]);
+
   const days = useMemo(() => getDaysInMonth(filters.month), [filters.month]);
 
   const selectedDayIndex = days.findIndex((item) => item.date === selectedDate);
@@ -72,13 +69,6 @@ const Itinerary = () => {
       })
       .sort((a, b) => getTimeInMinutes(a.time) - getTimeInMinutes(b.time));
   }, [activities, selectedDate, filters]);
-
-  const updateLastModified = () => {
-    const now = new Date().toISOString();
-
-    setLastModified(now);
-    localStorage.setItem(LAST_MODIFIED_KEY, now);
-  };
 
   const handleMonthChange = (event) => {
     const newMonth = event.target.value;
@@ -116,21 +106,9 @@ const Itinerary = () => {
     event.preventDefault();
 
     if (editingActivity) {
-      setActivities((prev) =>
-        prev.map((activity) =>
-          activity.id === editingActivity.id
-            ? { ...form, id: editingActivity.id }
-            : activity
-        )
-      );
+      dispatch(saveActivity({ ...form, id: editingActivity.id }));
     } else {
-      setActivities((prev) => [
-        ...prev,
-        {
-          ...form,
-          id: Date.now(),
-        },
-      ]);
+      dispatch(saveActivity(form));
     }
 
     setFilters((prev) => ({
@@ -139,7 +117,6 @@ const Itinerary = () => {
     }));
 
     setSelectedDate(form.date);
-    updateLastModified();
     closeModal();
   };
 
@@ -147,31 +124,11 @@ const Itinerary = () => {
     const confirmed = window.confirm("Delete this itinerary item?");
     if (!confirmed) return;
 
-    setActivities((prev) =>
-      prev.filter((activity) => activity.id !== activityId)
-    );
-
-    updateLastModified();
+    dispatch(deleteActivity(activityId));
   };
 
   const handleChangeStatus = (activityId) => {
-    const statusFlow = ["Planned", "In Progress", "Done"];
-
-    setActivities((prev) =>
-      prev.map((activity) => {
-        if (activity.id !== activityId) return activity;
-
-        const currentIndex = statusFlow.indexOf(activity.status);
-        const nextStatus = statusFlow[(currentIndex + 1) % statusFlow.length];
-
-        return {
-          ...activity,
-          status: nextStatus,
-        };
-      })
-    );
-
-    updateLastModified();
+    dispatch(changeActivityStatus(activityId));
   };
 
   const handleExportJson = () => {
