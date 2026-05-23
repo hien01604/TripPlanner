@@ -15,17 +15,31 @@ const PAGES = {
 };
 
 function App() {
-  const [selectedPage, setSelectedPage] = useState("Dashboard");
+  const [selectedPage, setSelectedPage] = useState("JourneyManagement");
+  const [preservedPage, setPreservedPage] = useState("Dashboard");
+
+  const handleSetSelectedPage = (page) => {
+    if (page !== "JourneyManagement") {
+      setPreservedPage(page);
+    }
+    setSelectedPage(page);
+  };
   const [selectedTripIndex, setSelectedTripIndex] = useState(0);
+  const [journeyManagementAction, setJourneyManagementAction] = useState(null);
 
   const PageComponent = PAGES[selectedPage] ?? Dashboard;
+
+  const selectedPageForPlanning = selectedPage === "JourneyManagement" ? preservedPage : selectedPage;
 
   return (
     <TripPlanner
       selectedPage={selectedPage}
-      setSelectedPage={setSelectedPage}
+      selectedPageForPlanning={selectedPageForPlanning}
+      setSelectedPage={handleSetSelectedPage}
       selectedTripIndex={selectedTripIndex}
       setSelectedTripIndex={setSelectedTripIndex}
+      journeyManagementAction={journeyManagementAction}
+      setJourneyManagementAction={setJourneyManagementAction}
     >
       <PageComponent selectedTripIndex={selectedTripIndex} />
     </TripPlanner>

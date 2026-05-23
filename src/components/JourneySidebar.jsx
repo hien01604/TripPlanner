@@ -1,9 +1,15 @@
 import { useSelector } from "react-redux";
-import { FaPlus } from "react-icons/fa";
+import { FaPlus, FaSuitcaseRolling } from "react-icons/fa";
 import { HiOutlineDotsVertical } from "react-icons/hi";
 import "../style/JourneySidebar.css";
 
-function JourneySidebar({ selectedTripIndex = 0, setSelectedTripIndex }) {
+function JourneySidebar({
+  selectedPage,
+  setSelectedPage,
+  setJourneyManagementAction,
+  selectedTripIndex = 0,
+  setSelectedTripIndex,
+}) {
   const trips = useSelector((state) => state.trip.trips ?? []);
 
   return (
@@ -11,18 +17,40 @@ function JourneySidebar({ selectedTripIndex = 0, setSelectedTripIndex }) {
       <h3 className="sidebar-title">JOURNEY</h3>
       <input className="search-input" placeholder="Find journey" />
       <div className="journey-list">
+        <div
+          className={`journey-item${selectedPage === "JourneyManagement" ? " active" : ""}`}
+          onClick={() => {
+            setJourneyManagementAction?.(null)
+            setSelectedPage("JourneyManagement")
+          }}
+        >
+          <span className="journey-item-left">
+            <FaSuitcaseRolling />
+            Trip Management
+          </span>
+        </div>
+
         {trips.map((trip, index) => (
           <div
             key={index}
-            className={`journey-item${index === selectedTripIndex ? " active" : ""}`}
-            onClick={() => setSelectedTripIndex(index)}
+            className={`journey-item${index === selectedTripIndex && selectedPage !== "JourneyManagement" ? " active" : ""}`}
+            onClick={() => {
+              setSelectedTripIndex(index);
+              setSelectedPage("Dashboard");
+            }}
           >
             <span>{trip.tripName}</span>
             <HiOutlineDotsVertical />
           </div>
         ))}
       </div>
-      <button className="create-btn">
+      <button
+        className="create-btn"
+        onClick={() => {
+          setJourneyManagementAction?.("create")
+          setSelectedPage("JourneyManagement")
+        }}
+      >
         <FaPlus />
         Create new journey
       </button>
