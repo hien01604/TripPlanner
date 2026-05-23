@@ -52,11 +52,13 @@ const initialState = savedTrip || {
       ],
       packingList: [
         { id: 1, name: "Passport / ID card", category: "Documents", quantity: 1, requiredStatus: "Required", packedStatus: "Not Packed" },
-        { id: 2, name: "Sunglasses", category: "Personal", quantity: 1, requiredStatus: "Optional", packedStatus: "Not Packed" }
+        { id: 2, name: "Sunglasses", category: "Personal", quantity: 1, requiredStatus: "Optional", packedStatus: "Not Packed" },
+        { id: 3, name: "Sunglasses", category: "Personal", quantity: 1, requiredStatus: "Optional", packedStatus: "Not Packed" },
+        { id: 4, name: "Sunglasses", category: "Personal", quantity: 1, requiredStatus: "Optional", packedStatus: "Not Packed" }
       ],
       budgetItems: [
         { id: 1, name: "Travel", category: "Transport", estimatedCost: 2000000, actualCost: 2100000, paymentStatus: "Paid" },
-        { id: 2, name: "Hotel", category: "Accommodation", estimatedCost: 3000000, actualCost: 3000000, paymentStatus: "Paid" }
+        { id: 2, name: "Hotel", category: "Accommodation", estimatedCost: 3000000, actualCost: 3000000, paymentStatus: "Paid" },
       ]
     },
     {
@@ -98,6 +100,22 @@ const tripSlice = createSlice({
   name: "trip",
   initialState,
   reducers: {
+    addTrip: (state, action) => {
+      state.trips.push(action.payload);
+      localStorage.setItem("tripData", JSON.stringify(state));
+    },
+
+    updateTrip: (state, action) => {
+      const { index, trip } = action.payload;
+
+      if (index < 0 || index >= state.trips.length) {
+        return;
+      }
+
+      state.trips[index] = trip;
+      localStorage.setItem("tripData", JSON.stringify(state));
+    },
+
     updateItinerary: (state, action) => {
       state.trips = action.payload;
       localStorage.setItem("tripData", JSON.stringify(state));

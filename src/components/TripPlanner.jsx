@@ -1,4 +1,4 @@
-import { useState } from "react"; 
+import JourneyManagement from "../pages/JourneyManagement";
 import {
   HiMenu,
   HiOutlineBell,
@@ -20,9 +20,15 @@ import Budget from "../pages/Budget";
 import Dashboard from "../pages/Dashboard";
 
 
-function TripPlanner({ selectedPage, setSelectedPage}) {
-  // Thêm state để lưu trip đang chọn
-  const [selectedTripIndex, setSelectedTripIndex] = useState(0);
+function TripPlanner({
+  selectedPage,
+  selectedPageForPlanning,
+  setSelectedPage,
+  selectedTripIndex,
+  setSelectedTripIndex,
+  journeyManagementAction,
+  setJourneyManagementAction,
+}) {
 
   return (
     <div className="dashboard-shell">
@@ -61,21 +67,48 @@ function TripPlanner({ selectedPage, setSelectedPage}) {
       </header>
 
       <div className="dashboard-body">
-        {/* Truyền state xuống JourneySidebar */}
-      <JourneySidebar
-        selectedTripIndex={selectedTripIndex}
-        setSelectedTripIndex={(index) => {
-          setSelectedTripIndex(index); // cập nhật trip
-          setSelectedPage("Dashboard"); // tự động nhảy về tab Dashboard
-        }}
-      />
-
-        <PlanningSidebar
-            selectedPage={selectedPage}
-            setSelectedPage={setSelectedPage}
-            selectedTripIndex={selectedTripIndex}
+        <JourneySidebar
+          selectedPage={selectedPage}
+          setSelectedPage={setSelectedPage}
+          setJourneyManagementAction={setJourneyManagementAction}
+          selectedTripIndex={selectedTripIndex}
+          setSelectedTripIndex={setSelectedTripIndex}
         />
 
+        <PlanningSidebar
+          selectedPage={selectedPageForPlanning}
+          setSelectedPage={setSelectedPage}
+          selectedTripIndex={selectedTripIndex}
+        />
+
+        <main className="dashboard-content">
+  {selectedPage === "Dashboard" && (
+    <Dashboard selectedTripIndex={selectedTripIndex} />
+  )}
+
+  {selectedPage === "JourneyManagement" && (
+    <JourneyManagement
+      selectedTripIndex={selectedTripIndex}
+      setSelectedTripIndex={setSelectedTripIndex}
+      setSelectedPage={setSelectedPage}
+      journeyManagementAction={journeyManagementAction}
+      setJourneyManagementAction={setJourneyManagementAction}
+    />
+  )}
+
+  {selectedPage === "Itinerary" && (
+    <Itinerary selectedTripIndex={selectedTripIndex} />
+  )}
+
+  {selectedPage === "Packing" && (
+    <Packing selectedTripIndex={selectedTripIndex} />
+  )}
+
+  {selectedPage === "Budget" && (
+    <Budget selectedTripIndex={selectedTripIndex} />
+  )}
+</main>Page === "Budget" && <Budget currentTripIndex={selectedTripIndex} />}
+        </main>
     <main className="dashboard-content">
       {selectedPage === "Dashboard" && <Dashboard selectedTripIndex={selectedTripIndex} setSelectedPage={setSelectedPage}/>}
       {selectedPage === "Itinerary" && <Itinerary selectedTripIndex={selectedTripIndex} />}
