@@ -120,6 +120,31 @@ const tripSlice = createSlice({
       state.trips = action.payload;
       localStorage.setItem("tripData", JSON.stringify(state));
     },
+    togglePackingItem: (state, action) => {
+      const { tripIndex, itemId } = action.payload
+      const list = state.trips[tripIndex].packingList
+      const item = list.find(i => i.id === itemId)
+      if (item) item.packedStatus = item.packedStatus === "Packed" ? "Not Packed" : "Packed"
+      localStorage.setItem("tripData", JSON.stringify(state))
+    },
+    addPackingItem: (state, action) => {
+      const { tripIndex, item } = action.payload
+      state.trips[tripIndex].packingList.push(item)
+      localStorage.setItem("tripData", JSON.stringify(state))
+    },
+    deletePackingItem: (state, action) => {
+      const { tripIndex, itemId } = action.payload
+      const list = state.trips[tripIndex].packingList
+      state.trips[tripIndex].packingList = list.filter(i => i.id !== itemId)
+      localStorage.setItem("tripData", JSON.stringify(state))
+    },
+    updatePackingItem: (state, action) => {
+      const { tripIndex, item } = action.payload
+      const list = state.trips[tripIndex].packingList
+      const idx = list.findIndex(i => i.id === item.id)
+      if (idx !== -1) list[idx] = item
+      localStorage.setItem("tripData", JSON.stringify(state))
+    },
     markPackingItemPacked: (state, action) => {
       const tripIndex = action.payload.tripIndex;
       const itemId = action.payload.itemId;
@@ -166,5 +191,5 @@ const tripSlice = createSlice({
   }
 });
 
-export const { updateItinerary, markPackingItemPacked, updateTripBudget, addBudgetItem, updateBudgetItem, deleteBudgetItem } = tripSlice.actions;
+export const { addTrip, updateTrip, updateItinerary, togglePackingItem, addPackingItem, deletePackingItem, updatePackingItem, markPackingItemPacked, updateTripBudget, addBudgetItem, updateBudgetItem, deleteBudgetItem } = tripSlice.actions;
 export default tripSlice.reducer;
