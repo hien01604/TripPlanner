@@ -1,13 +1,11 @@
+import { useState } from "react";
 import JourneyManagement from "../pages/JourneyManagement";
+import { useDispatch } from "react-redux";
 import {
   HiMenu,
   HiOutlineBell,
   HiOutlineDotsVertical,
 } from "react-icons/hi";
-import {
-  FiSearch,
-  FiFilter,
-} from "react-icons/fi";
 import { IoMdUndo } from "react-icons/io";
 
 
@@ -18,6 +16,7 @@ import Itinerary from "../pages/Itinerary";
 import Packing from "../pages/Packing";
 import Budget from "../pages/Budget";
 import Dashboard from "../pages/Dashboard";
+import { undoTripData } from "../data/tripSlice";
 
 
 function TripPlanner({
@@ -29,26 +28,38 @@ function TripPlanner({
   journeyManagementAction,
   setJourneyManagementAction,
 }) {
+  const dispatch = useDispatch();
+  const showPlanningShell = selectedPage !== "JourneyManagement";
+  const [sidebarsOpen, setSidebarsOpen] = useState(false);
+  const showJourneySidebar = sidebarsOpen;
+  const showPlanningSidebar = sidebarsOpen && showPlanningShell;
+
+  const handleSetSelectedPage = (page) => {
+    if (page !== "JourneyManagement") {
+      setSidebarsOpen(true);
+    }
+
+    setSelectedPage(page);
+  };
+
+  const handleUndoLastAction = () => {
+    dispatch(undoTripData());
+  };
 
   return (
     <div className="dashboard-shell">
       <header className="top-navbar">
-        <button type="button" className="top-navbar__menu" aria-label="Open menu">
+        <button
+          type="button"
+          className={`top-navbar__menu${sidebarsOpen ? " active" : ""}`}
+          aria-label={sidebarsOpen ? "Close menu" : "Open menu"}
+          aria-pressed={sidebarsOpen}
+          onClick={() => setSidebarsOpen((currentOpen) => !currentOpen)}
+        >
           <HiMenu />
         </button>
-        <div className="top-navbar__search">
-          <FiSearch className="search-icon" aria-hidden />
-          <input
-            type="search"
-            placeholder="Find in this website"
-            aria-label="Find in this website"
-          />
-          <button type="button" className="filter-btn" aria-label="Filter search">
-            <FiFilter />
-          </button>
-        </div>
         <div className="top-navbar__actions">
-          <button type="button" className="top-navbar__undo">
+          <button type="button" className="top-navbar__undo" onClick={handleUndoLastAction} aria-label="Undo last action">
             <IoMdUndo />
             Undo
           </button>
@@ -67,54 +78,51 @@ function TripPlanner({
       </header>
 
       <div className="dashboard-body">
-        <JourneySidebar
-          selectedPage={selectedPage}
-          setSelectedPage={setSelectedPage}
-          setJourneyManagementAction={setJourneyManagementAction}
-          selectedTripIndex={selectedTripIndex}
-          setSelectedTripIndex={setSelectedTripIndex}
-        />
+        {showJourneySidebar && (
+          <JourneySidebar
+            selectedPage={selectedPage}
+            setSelectedPage={handleSetSelectedPage}
+            setJourneyManagementAction={setJourneyManagementAction}
+            selectedTripIndex={selectedTripIndex}
+            setSelectedTripIndex={setSelectedTripIndex}
+          />
+        )}
 
-        <PlanningSidebar
-          selectedPage={selectedPageForPlanning}
-          setSelectedPage={setSelectedPage}
-          selectedTripIndex={selectedTripIndex}
-        />
+        {showPlanningSidebar && (
+          <PlanningSidebar
+            selectedPage={selectedPageForPlanning}
+            setSelectedPage={handleSetSelectedPage}
+            selectedTripIndex={selectedTripIndex}
+          />
+        )}
 
         <main className="dashboard-content">
-  {selectedPage === "Dashboard" && (
-    <Dashboard selectedTripIndex={selectedTripIndex} />
-  )}
+          {selectedPage === "Dashboard" && (
+            <Dashboard selectedTripIndex={selectedTripIndex} />
+          )}
 
-  {selectedPage === "JourneyManagement" && (
-    <JourneyManagement
-      selectedTripIndex={selectedTripIndex}
-      setSelectedTripIndex={setSelectedTripIndex}
-      setSelectedPage={setSelectedPage}
-      journeyManagementAction={journeyManagementAction}
-      setJourneyManagementAction={setJourneyManagementAction}
-    />
-  )}
+          {selectedPage === "JourneyManagement" && (
+            <JourneyManagement
+              selectedTripIndex={selectedTripIndex}
+              setSelectedTripIndex={setSelectedTripIndex}
+              setSelectedPage={handleSetSelectedPage}
+              journeyManagementAction={journeyManagementAction}
+              setJourneyManagementAction={setJourneyManagementAction}
+            />
+          )}
 
-  {selectedPage === "Itinerary" && (
-    <Itinerary selectedTripIndex={selectedTripIndex} />
-  )}
+          {selectedPage === "Itinerary" && (
+            <Itinerary selectedTripIndex={selectedTripIndex} />
+          )}
 
-  {selectedPage === "Packing" && (
-    <Packing selectedTripIndex={selectedTripIndex} />
-  )}
+          {selectedPage === "Packing" && (
+            <Packing selectedTripIndex={selectedTripIndex} />
+          )}
 
-  {selectedPage === "Budget" && (
-    <Budget selectedTripIndex={selectedTripIndex} />
-  )}
-</main>Page === "Budget" && <Budget currentTripIndex={selectedTripIndex} />}
+          {selectedPage === "Budget" && (
+            <Budget selectedTripIndex={selectedTripIndex} />
+          )}
         </main>
-    <main className="dashboard-content">
-      {selectedPage === "Dashboard" && <Dashboard selectedTripIndex={selectedTripIndex} />}
-      {selectedPage === "Itinerary" && <Itinerary selectedTripIndex={selectedTripIndex} />}
-      {selectedPage === "Packing" && <Packing selectedTripIndex={selectedTripIndex} />}
-      {selectedPage === "Budget" && <Budget selectedTripIndex={selectedTripIndex} />}
-    </main>
       </div>
     </div>
   );

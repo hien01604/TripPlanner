@@ -145,14 +145,46 @@ const tripSlice = createSlice({
       if (idx !== -1) list[idx] = item
       localStorage.setItem("tripData", JSON.stringify(state))
     },
+    deleteTrip: (state, action) => {
+      const index = action.payload;
+
+      if (index < 0 || index >= state.trips.length) {
+        return;
+      }
+
+      state.trips.splice(index, 1);
+      localStorage.setItem("tripData", JSON.stringify(state));
+    },
+    undoTripData: (state) => {
+      try {
+        const raw = localStorage.getItem("tripData_history");
+        if (!raw) return;
+        const history = JSON.parse(raw);
+        if (!Array.isArray(history) || history.length === 0) return;
+
+        const previous = history[history.length - 1];
+        if (previous && Array.isArray(previous.trips)) {
+          state.trips = JSON.parse(JSON.stringify(previous.trips));
+          const nextHistory = history.slice(0, -1);
+          localStorage.setItem("tripData_history", JSON.stringify(nextHistory));
+          localStorage.setItem("tripData", JSON.stringify({ trips: state.trips }));
+        }
+      } catch {
+        // silently ignore parsing errors
+      }
+    },
   }
 });
 
-export const { addTrip, updateTrip, updateItinerary, markPackingItemPacked } = tripSlice.actions;
-export const { 
-  updateItinerary, 
+export const {
+  addTrip,
+  updateTrip,
+  updateItinerary,
   togglePackingItem,
   addPackingItem,
   deletePackingItem,
-  updatePackingItem, } = tripSlice.actions;
+  updatePackingItem,
+  deleteTrip,
+  undoTripData,
+} = tripSlice.actions;
 export default tripSlice.reducer;
