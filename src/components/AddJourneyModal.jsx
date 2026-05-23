@@ -18,7 +18,7 @@ export default function AddJourneyModal({
     const [endDate, setEndDate] = useState(initialJourney?.endDate || "");
     const [note, setNote] = useState(initialJourney?.note || "");
     const [thumbnailPreview, setThumbnailPreview] = useState(initialJourney?.thumbnail || null);
-    const [error, setError] = useState("");
+    const [errors, setErrors] = useState({});
 
     const formatBudget = (value) => {
         const numbersOnly = value.replace(/\D/g, "");
@@ -38,17 +38,59 @@ export default function AddJourneyModal({
         setThumbnailPreview(base64);
     };
 
-    const handleCreate = () => {
-        setError("");
+    const clearError = (fieldName) => {
+        setErrors((currentErrors) => ({
+            ...currentErrors,
+            [fieldName]: "",
+        }));
+    };
 
-        if (!title.trim()) {
-            setError("Trip Title is required");
+    const handleCreate = () => {
+        const nextErrors = {};
+        const trimmedTitle = title.trim();
+        const numericBudgetText = budget.replace(/,/g, "").trim();
+        const parsedBudget = numericBudgetText ? Number(numericBudgetText) : NaN;
+        const start = startDate ? new Date(startDate) : null;
+        const end = endDate ? new Date(endDate) : null;
+
+        if (!trimmedTitle) {
+            nextErrors.title = "Trip title is required.";
+        }
+
+        if (!numericBudgetText) {
+            nextErrors.budget = "Total budget is required.";
+        } else if (!Number.isFinite(parsedBudget)) {
+            nextErrors.budget = "Total budget must be a valid number.";
+        } else if (parsedBudget < 0) {
+            nextErrors.budget = "Total budget cannot be negative.";
+        }
+
+        if (!startDate) {
+            nextErrors.startDate = "Start date is required.";
+        } else if (Number.isNaN(start?.getTime())) {
+            nextErrors.startDate = "Start date is invalid.";
+        }
+
+        if (!endDate) {
+            nextErrors.endDate = "End date is required.";
+        } else if (Number.isNaN(end?.getTime())) {
+            nextErrors.endDate = "End date is invalid.";
+        }
+
+        if (start && end && !Number.isNaN(start.getTime()) && !Number.isNaN(end.getTime()) && end < start) {
+            nextErrors.endDate = "End date must be on or after the start date.";
+        }
+
+        if (Object.keys(nextErrors).length > 0) {
+            setErrors(nextErrors);
             return;
         }
 
+        setErrors({});
+
         onCreate({
-            title: title.trim(),
-            budget: budget ? parseFloat(budget.replace(/,/g, "")) : 0,
+            title: trimmedTitle,
+            budget: Number(parsedBudget),
             startDate,
             endDate,
             note: note.trim(),
@@ -72,21 +114,29 @@ export default function AddJourneyModal({
 
                 <h2>{mode === "edit" ? "Edit Journey" : "Add New Journey"}</h2>
 
-                {error && <div className="modal-error">{error}</div>}
+                {Object.keys(errors).length > 0 && (
+                    <div className="modal-error" role="alert" aria-live="polite">
+                        <strong>Please fix the highlighted fields.</strong>
+                    </div>
+                )}
 
                 <div className="modal-form">
-                    <div className="form-group">
-                        <label>Trip Title</label>
+                    <div className={`form-group${errors.title ? " form-group--error" : ""}`}>
+                        <label>Trip Title <span className="required-mark">*</span></label>
                         <input
                             type="text"
                             placeholder="Enter trip title"
                             value={title}
-                            onChange={(event) => setTitle(event.target.value)}
+                            onChange={(event) => {
+                                setTitle(event.target.value);
+                                clearError("title");
+                            }}
                         />
+                        {errors.title && <p className="field-error">{errors.title}</p>}
                     </div>
 
-                    <div className="form-group">
-                        <label>Total Budget</label>
+                    <div className={`form-group${errors.budget ? " form-group--error" : ""}`}>
+                        <label>Total Budget <span className="required-mark">*</span></label>
 
                         <div className="budget-input-wrapper">
                             <input
@@ -94,22 +144,42 @@ export default function AddJourneyModal({
                                 inputMode="numeric"
                                 placeholder="1,000,000"
                                 value={budget}
-                                onChange={(event) => setBudget(formatBudget(event.target.value))}
+                                onChange={(event) => {
+                                    setBudget(formatBudget(event.target.value));
+                                    clearError("budget");
+                                }}
                             />
 
                             <span className="budget-currency">VNĐ</span>
                         </div>
+                        {errors.budget && <p className="field-error">{errors.budget}</p>}
                     </div>
 
                     <div className="modal-row">
-                        <div className="form-group">
-                            <label>Start Date</label>
-                            <input type="date" value={startDate} onChange={(event) => setStartDate(event.target.value)} />
+                        <div className={`form-group${errors.startDate ? " form-group--error" : ""}`}>
+                            <label>Start Date <span className="required-mark">*</span></label>
+                            <input
+                                type="date"
+                                value={startDate}
+                                onChange={(event) => {
+                                    setStartDate(event.target.value);
+                                    clearError("startDate");
+                                }}
+                            />
+                            {errors.startDate && <p className="field-error">{errors.startDate}</p>}
                         </div>
 
-                        <div className="form-group">
-                            <label>End Date</label>
-                            <input type="date" value={endDate} onChange={(event) => setEndDate(event.target.value)} />
+                        <div className={`form-group${errors.endDate ? " form-group--error" : ""}`}>
+                            <label>End Date <span className="required-mark">*</span></label>
+                            <input
+                                type="date"
+                                value={endDate}
+                                onChange={(event) => {
+                                    setEndDate(event.target.value);
+                                    clearError("endDate");
+                                }}
+                            />
+                            {errors.endDate && <p className="field-error">{errors.endDate}</p>}
                         </div>
                     </div>
 

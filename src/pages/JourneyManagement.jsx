@@ -3,7 +3,8 @@ import { useDispatch, useSelector } from "react-redux";
 
 import JourneyCard from "../components/JourneyCard";
 import AddJourneyModal from "../components/AddJourneyModal";
-import { addTrip, updateTrip } from "../data/tripSlice";
+import MessageBox from "../components/MessageBox";
+import { addTrip, deleteTrip, updateTrip } from "../data/tripSlice";
 import "../style/JourneyManagement.css";
 
 function JourneyManagement({
@@ -17,6 +18,7 @@ function JourneyManagement({
     const trips = useSelector((state) => state.trip.trips ?? []);
     const [showModal, setShowModal] = useState(false);
     const [editingIndex, setEditingIndex] = useState(null);
+    const [deleteTargetIndex, setDeleteTargetIndex] = useState(null);
     const editingTrip = editingIndex !== null ? trips[editingIndex] : null;
 
     const openCreateModal = () => {
@@ -36,6 +38,30 @@ function JourneyManagement({
         setShowModal(false);
         setEditingIndex(null);
         setJourneyManagementAction?.(null);
+    };
+
+    const handleDeleteJourney = (index) => {
+        setDeleteTargetIndex(index);
+    };
+
+    const confirmDeleteJourney = () => {
+        if (deleteTargetIndex === null) return;
+
+        const index = deleteTargetIndex;
+        const nextTripsLength = trips.length - 1;
+        const nextSelectedIndex =
+            nextTripsLength <= 0
+                ? 0
+                : Math.min(selectedTripIndex > index ? selectedTripIndex - 1 : selectedTripIndex, nextTripsLength - 1);
+
+        dispatch(deleteTrip(index));
+        setSelectedTripIndex(nextSelectedIndex);
+        setSelectedPage("JourneyManagement");
+        setDeleteTargetIndex(null);
+    };
+
+    const cancelDeleteJourney = () => {
+        setDeleteTargetIndex(null);
     };
 
     const isCreateIntent = journeyManagementAction === "create";
@@ -71,7 +97,7 @@ function JourneyManagement({
         <div className="journey-management">
             <div className="journey-management__header">
                 <div>
-                    <p className="journey-management__eyebrow">Journey Management</p>
+                    {/* <p className="journey-management__eyebrow">Journey Management</p> */}
                     <h1 className="journey-management__title">Welcome to Journie!</h1>
                     <p className="journey-management__subtitle">
                         Create, edit, and jump into any journey from one place.
@@ -85,7 +111,6 @@ function JourneyManagement({
                 </button>
 
                 {trips.map((trip, index) => {
-                    const isActive = index === selectedTripIndex;
                     const journey = {
                         ...trip,
                         title: trip.title ?? trip.tripName ?? "Untitled journey",
@@ -100,7 +125,7 @@ function JourneyManagement({
                                 setSelectedPage("Dashboard");
                             }}
                             onEditJourney={() => openEditModal(index)}
-                            active={isActive}
+                            onDeleteJourney={() => handleDeleteJourney(index)}
                         />
                     );
                 })}
@@ -122,6 +147,16 @@ function JourneyManagement({
                     } : null}
                 />
             )}
+
+            <MessageBox
+                visible={deleteTargetIndex !== null}
+                title="Delete journey"
+                message={`Delete "${trips[deleteTargetIndex]?.tripName ?? trips[deleteTargetIndex]?.title ?? "this journey"}"? This action cannot be undone.`}
+                confirmText="Delete"
+                cancelText="Cancel"
+                onConfirm={confirmDeleteJourney}
+                onCancel={cancelDeleteJourney}
+            />
         </div>
     );
 }
