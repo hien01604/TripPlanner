@@ -110,8 +110,7 @@ const filteredItems = items.filter(item => {
             items={filteredItems}
             togglePacked={togglePacked}
             deleteItem={deleteItem}
-            openModal={() => { setEditingItem(null); setOpenModal(true) }}
-            openEditModal={openEditModal}
+            openModal={() => { setEditingItem({ category: selectedCategory }); setOpenModal(true) }}            openEditModal={openEditModal}
           />
         </div>
       </div>

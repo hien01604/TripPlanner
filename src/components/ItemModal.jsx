@@ -2,6 +2,8 @@ import { useState } from "react"
 import "../style/ItemModal.css"
 
 function ItemModal({ closeModal, addItem, editingItem, updateItem }) {
+  const isEditing = !!editingItem?.id
+
   const [name,     setName]     = useState(editingItem?.name     || "")
   const [category, setCategory] = useState(editingItem?.category || "")
   const [quantity, setQuantity] = useState(editingItem?.quantity || 1)
@@ -17,7 +19,7 @@ function ItemModal({ closeModal, addItem, editingItem, updateItem }) {
       requiredStatus: required ? "Required" : "Optional",
       packedStatus:   editingItem?.packedStatus || "Not Packed",
     }
-    editingItem ? updateItem(itemData) : addItem(itemData)
+    isEditing ? updateItem(itemData) : addItem(itemData)
     closeModal()
   }
 
@@ -25,7 +27,7 @@ function ItemModal({ closeModal, addItem, editingItem, updateItem }) {
     <div className="modal-overlay">
       <div className="item-modal">
         <div className="modal-top">
-          <h2>{editingItem ? "Edit Item" : "New Item"}</h2>
+          <h2>{isEditing ? "Edit Item" : "New Item"}</h2>
           <button className="close-btn" onClick={closeModal}>✕</button>
         </div>
 
@@ -37,12 +39,11 @@ function ItemModal({ closeModal, addItem, editingItem, updateItem }) {
         <div className="modal-group">
           <label>Category</label>
           <select value={category} onChange={(e) => setCategory(e.target.value)}>
-            <option value="">Select category</option>
-            <option>Clothes</option>
-            <option>Documents</option>
-            <option>Electronics</option>
-            <option>Medicine</option>
-            <option>Personal</option>
+              <option>Clothes</option>
+              <option>Documents</option>
+              <option>Electronics</option>
+              <option>Medicine</option>
+              <option>Personal</option>
           </select>
         </div>
 
@@ -59,7 +60,7 @@ function ItemModal({ closeModal, addItem, editingItem, updateItem }) {
         </div>
 
         <button className="submit-btn" onClick={handleSubmit}>
-          {editingItem ? "Save Changes" : "Add to bag"}
+          {isEditing ? "Save Changes" : "Add to bag"}
         </button>
       </div>
     </div>
