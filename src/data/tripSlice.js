@@ -120,39 +120,51 @@ const tripSlice = createSlice({
       state.trips = action.payload;
       localStorage.setItem("tripData", JSON.stringify(state));
     },
-    togglePackingItem: (state, action) => {
-      const { tripIndex, itemId } = action.payload
-      const list = state.trips[tripIndex].packingList
-      const item = list.find(i => i.id === itemId)
-      if (item) item.packedStatus = item.packedStatus === "Packed" ? "Not Packed" : "Packed"
+    markPackingItemPacked: (state, action) => {
+      const tripIndex = action.payload.tripIndex;
+      const itemId = action.payload.itemId;
+      const updatedList = state.trips[tripIndex].packingList.map(item =>
+        item.id === itemId ? { ...item, packedStatus: "Packed" } : item
+      );
+      state.trips[tripIndex].packingList = updatedList;
+      localStorage.setItem("tripData", JSON.stringify(state));
+    },
+    updateTripBudget: (state, action)=> {
+      const { tripIndex, newBudget } = action.payload;
+      state.trips[tripIndex].budget = newBudget;
       localStorage.setItem("tripData", JSON.stringify(state))
     },
-    addPackingItem: (state, action) => {
-      const { tripIndex, item } = action.payload
-      state.trips[tripIndex].packingList.push(item)
+    addBudgetItem: (state, action) => {
+      const { tripIndex, newItem } = action.payload;
+
+      if (!state.trips[tripIndex].budgetItems) {
+        state.trips[tripIndex].budgetItems = []
+      }
+      
+      state.trips[tripIndex].budgetItems.push(newItem);
       localStorage.setItem("tripData", JSON.stringify(state))
     },
-    deletePackingItem: (state, action) => {
-      const { tripIndex, itemId } = action.payload
-      const list = state.trips[tripIndex].packingList
-      state.trips[tripIndex].packingList = list.filter(i => i.id !== itemId)
-      localStorage.setItem("tripData", JSON.stringify(state))
+    updateBudgetItem: (state, action) => {
+      const { tripIndex, itemId, changes } = action.payload;
+      const trip = state.trips[tripIndex];
+      if (!trip) return;
+
+      const item = trip.budgetItems.find(item => item.id === itemId);
+      if (!item) return;
+
+      Object.assign(item, changes);
     },
-    updatePackingItem: (state, action) => {
-      const { tripIndex, item } = action.payload
-      const list = state.trips[tripIndex].packingList
-      const idx = list.findIndex(i => i.id === item.id)
-      if (idx !== -1) list[idx] = item
-      localStorage.setItem("tripData", JSON.stringify(state))
-    },
+
+    deleteBudgetItem: (state, action) => {
+      const { tripIndex, itemId } = action.payload;
+      const trip = state.trips[tripIndex];
+      if (!trip) return;
+
+      trip.budgetItems = trip.budgetItems.filter(item => item.id !== itemId);
+    }
+
   }
 });
 
-export const { addTrip, updateTrip, updateItinerary, markPackingItemPacked } = tripSlice.actions;
-export const { 
-  updateItinerary, 
-  togglePackingItem,
-  addPackingItem,
-  deletePackingItem,
-  updatePackingItem, } = tripSlice.actions;
+export const { updateItinerary, markPackingItemPacked, updateTripBudget, addBudgetItem, updateBudgetItem, deleteBudgetItem } = tripSlice.actions;
 export default tripSlice.reducer;
