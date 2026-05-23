@@ -87,9 +87,9 @@ function JourneyManagement({
         } else {
             dispatch(addTrip(nextTrip));
             setSelectedTripIndex(trips.length);
+            // keep user on Journey Management after creating a trip
         }
 
-        setSelectedPage("Dashboard");
         closeModal();
     };
 

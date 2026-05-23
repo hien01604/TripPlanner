@@ -1,7 +1,13 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-// Load from localStorage if exists
-const savedTrip = JSON.parse(localStorage.getItem("tripData"));
+// Load from localStorage if exists (safe parse)
+let savedTrip = null;
+try {
+  const raw = localStorage.getItem("tripData");
+  if (raw) savedTrip = JSON.parse(raw);
+} catch {
+  savedTrip = null;
+}
 
 const initialState = savedTrip || {
   trips: [
@@ -100,12 +106,31 @@ const tripSlice = createSlice({
   name: "trip",
   initialState,
   reducers: {
+    // record a snapshot of current trips into localStorage history for undo
+    _recordHistory: (state) => { },
+
+
+
     addTrip: (state, action) => {
+      try {
+        const raw = localStorage.getItem("tripData_history");
+        const history = raw ? JSON.parse(raw) : [];
+        history.push({ trips: JSON.parse(JSON.stringify(state.trips)) });
+        if (history.length > 50) history.shift();
+        localStorage.setItem("tripData_history", JSON.stringify(history));
+      } catch { }
       state.trips.push(action.payload);
       localStorage.setItem("tripData", JSON.stringify(state));
     },
 
     updateTrip: (state, action) => {
+      try {
+        const raw = localStorage.getItem("tripData_history");
+        const history = raw ? JSON.parse(raw) : [];
+        history.push({ trips: JSON.parse(JSON.stringify(state.trips)) });
+        if (history.length > 50) history.shift();
+        localStorage.setItem("tripData_history", JSON.stringify(history));
+      } catch { }
       const { index, trip } = action.payload;
 
       if (index < 0 || index >= state.trips.length) return;
@@ -115,11 +140,25 @@ const tripSlice = createSlice({
     },
 
     updateItinerary: (state, action) => {
+      try {
+        const raw = localStorage.getItem("tripData_history");
+        const history = raw ? JSON.parse(raw) : [];
+        history.push({ trips: JSON.parse(JSON.stringify(state.trips)) });
+        if (history.length > 50) history.shift();
+        localStorage.setItem("tripData_history", JSON.stringify(history));
+      } catch { }
       state.trips = action.payload;
       localStorage.setItem("tripData", JSON.stringify(state));
     },
 
     togglePackingItem: (state, action) => {
+      try {
+        const raw = localStorage.getItem("tripData_history");
+        const history = raw ? JSON.parse(raw) : [];
+        history.push({ trips: JSON.parse(JSON.stringify(state.trips)) });
+        if (history.length > 50) history.shift();
+        localStorage.setItem("tripData_history", JSON.stringify(history));
+      } catch { }
       const { tripIndex, itemId } = action.payload;
       const item = state.trips[tripIndex]?.packingList?.find(
         item => item.id === itemId
@@ -134,6 +173,13 @@ const tripSlice = createSlice({
     },
 
     addPackingItem: (state, action) => {
+      try {
+        const raw = localStorage.getItem("tripData_history");
+        const history = raw ? JSON.parse(raw) : [];
+        history.push({ trips: JSON.parse(JSON.stringify(state.trips)) });
+        if (history.length > 50) history.shift();
+        localStorage.setItem("tripData_history", JSON.stringify(history));
+      } catch { }
       const { tripIndex, item } = action.payload;
 
       if (!state.trips[tripIndex].packingList) {
@@ -145,6 +191,13 @@ const tripSlice = createSlice({
     },
 
     deletePackingItem: (state, action) => {
+      try {
+        const raw = localStorage.getItem("tripData_history");
+        const history = raw ? JSON.parse(raw) : [];
+        history.push({ trips: JSON.parse(JSON.stringify(state.trips)) });
+        if (history.length > 50) history.shift();
+        localStorage.setItem("tripData_history", JSON.stringify(history));
+      } catch { }
       const { tripIndex, itemId } = action.payload;
       const trip = state.trips[tripIndex];
 
@@ -158,6 +211,13 @@ const tripSlice = createSlice({
     },
 
     updatePackingItem: (state, action) => {
+      try {
+        const raw = localStorage.getItem("tripData_history");
+        const history = raw ? JSON.parse(raw) : [];
+        history.push({ trips: JSON.parse(JSON.stringify(state.trips)) });
+        if (history.length > 50) history.shift();
+        localStorage.setItem("tripData_history", JSON.stringify(history));
+      } catch { }
       const { tripIndex, item } = action.payload;
       const list = state.trips[tripIndex]?.packingList;
 
@@ -173,6 +233,13 @@ const tripSlice = createSlice({
     },
 
     updateTripBudget: (state, action) => {
+      try {
+        const raw = localStorage.getItem("tripData_history");
+        const history = raw ? JSON.parse(raw) : [];
+        history.push({ trips: JSON.parse(JSON.stringify(state.trips)) });
+        if (history.length > 50) history.shift();
+        localStorage.setItem("tripData_history", JSON.stringify(history));
+      } catch { }
       const { tripIndex, newBudget } = action.payload;
 
       if (!state.trips[tripIndex]) return;
@@ -182,6 +249,13 @@ const tripSlice = createSlice({
     },
 
     addBudgetItem: (state, action) => {
+      try {
+        const raw = localStorage.getItem("tripData_history");
+        const history = raw ? JSON.parse(raw) : [];
+        history.push({ trips: JSON.parse(JSON.stringify(state.trips)) });
+        if (history.length > 50) history.shift();
+        localStorage.setItem("tripData_history", JSON.stringify(history));
+      } catch { }
       const { tripIndex, newItem } = action.payload;
 
       if (!state.trips[tripIndex]) return;
@@ -195,6 +269,13 @@ const tripSlice = createSlice({
     },
 
     updateBudgetItem: (state, action) => {
+      try {
+        const raw = localStorage.getItem("tripData_history");
+        const history = raw ? JSON.parse(raw) : [];
+        history.push({ trips: JSON.parse(JSON.stringify(state.trips)) });
+        if (history.length > 50) history.shift();
+        localStorage.setItem("tripData_history", JSON.stringify(history));
+      } catch { }
       const { tripIndex, itemId, changes } = action.payload;
       const trip = state.trips[tripIndex];
 
@@ -209,6 +290,13 @@ const tripSlice = createSlice({
     },
 
     deleteBudgetItem: (state, action) => {
+      try {
+        const raw = localStorage.getItem("tripData_history");
+        const history = raw ? JSON.parse(raw) : [];
+        history.push({ trips: JSON.parse(JSON.stringify(state.trips)) });
+        if (history.length > 50) history.shift();
+        localStorage.setItem("tripData_history", JSON.stringify(history));
+      } catch { }
       const { tripIndex, itemId } = action.payload;
       const trip = state.trips[tripIndex];
 
@@ -219,6 +307,40 @@ const tripSlice = createSlice({
       );
 
       localStorage.setItem("tripData", JSON.stringify(state));
+    }
+    ,
+    deleteTrip: (state, action) => {
+      const index = action.payload;
+      try {
+        const raw = localStorage.getItem("tripData_history");
+        const history = raw ? JSON.parse(raw) : [];
+        history.push({ trips: JSON.parse(JSON.stringify(state.trips)) });
+        if (history.length > 50) history.shift();
+        localStorage.setItem("tripData_history", JSON.stringify(history));
+      } catch { }
+      if (typeof index !== 'number') return;
+      if (index < 0 || index >= state.trips.length) return;
+
+      state.trips.splice(index, 1);
+      localStorage.setItem("tripData", JSON.stringify(state));
+    }
+    ,
+    undoTripData: (state) => {
+      try {
+        const raw = localStorage.getItem("tripData_history");
+        if (!raw) return;
+        const history = JSON.parse(raw);
+        if (!Array.isArray(history) || history.length === 0) return;
+        const last = history[history.length - 1];
+        if (last && Array.isArray(last.trips)) {
+          state.trips = JSON.parse(JSON.stringify(last.trips));
+          const nextHistory = history.slice(0, -1);
+          localStorage.setItem("tripData_history", JSON.stringify(nextHistory));
+          localStorage.setItem("tripData", JSON.stringify({ trips: state.trips }));
+        }
+      } catch {
+        // ignore parse errors
+      }
     }
   }
 });
@@ -235,6 +357,8 @@ export const {
   addBudgetItem,
   updateBudgetItem,
   deleteBudgetItem,
+  deleteTrip,
+  undoTripData,
 } = tripSlice.actions;
 
 export default tripSlice.reducer;
