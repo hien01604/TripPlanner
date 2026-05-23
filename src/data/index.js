@@ -3,6 +3,6 @@ import tripReducer from "./tripSlice";
 
 export const store = configureStore({
   reducer: {
-    trip: tripReducer
-  }
+    trip: tripReducer,
+  },
 });

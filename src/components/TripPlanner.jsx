@@ -78,9 +78,9 @@ function TripPlanner({ selectedPage, setSelectedPage}) {
 
     <main className="dashboard-content">
       {selectedPage === "Dashboard" && <Dashboard selectedTripIndex={selectedTripIndex} />}
-      {selectedPage === "Itinerary" && <Itinerary currentTripIndex={selectedTripIndex} />}
-      {selectedPage === "Packing" && <Packing currentTripIndex={selectedTripIndex} />}
-      {selectedPage === "Budget" && <Budget currentTripIndex={selectedTripIndex} />}
+      {selectedPage === "Itinerary" && <Itinerary selectedTripIndex={selectedTripIndex} />}
+      {selectedPage === "Packing" && <Packing selectedTripIndex={selectedTripIndex} />}
+      {selectedPage === "Budget" && <Budget selectedTripIndex={selectedTripIndex} />}
     </main>
       </div>
     </div>

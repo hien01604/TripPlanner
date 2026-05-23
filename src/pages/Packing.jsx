@@ -8,17 +8,20 @@ import PackingTable from "../components/PackingTable"
 import ItemModal from "../components/ItemModal"
 import "../style/Packing.css"
 
-function Packing() {
-  const dispatch     = useDispatch()
-  const tripIndex    = 0  
-  const items        = useSelector(state => state.trip.trips[tripIndex].packingList)
+function Packing({ selectedTripIndex = 0 }) {
+  const dispatch = useDispatch()
+  const tripIndex = selectedTripIndex
+
+  const items = useSelector(
+    state => state.trip.trips[tripIndex]?.packingList ?? []
+  )
 
   const [selectedCategory, setSelectedCategory] = useState("Clothes")
-  const [searchTerm, setSearchTerm]             = useState("")
-  const [statusFilter, setStatusFilter]         = useState("All")
-  const [typeFilter, setTypeFilter]             = useState("All")
-  const [openModal, setOpenModal]               = useState(false)
-  const [editingItem, setEditingItem]           = useState(null)
+  const [searchTerm, setSearchTerm] = useState("")
+  const [statusFilter, setStatusFilter] = useState("All")
+  const [typeFilter, setTypeFilter] = useState("All")
+  const [openModal, setOpenModal] = useState(false)
+  const [editingItem, setEditingItem] = useState(null)
 
   const totalItems    = items.length
   const packedItems   = items.filter(item => item.packedStatus === "Packed").length
@@ -46,11 +49,30 @@ function Packing() {
     setEditingItem(null)
   }
 
-  const filteredItems = items.filter(item => {
-    const matchCategory = !selectedCategory || item.category === selectedCategory
-    const matchSearch   = item.name.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchStatus   = statusFilter === "All" ? true : statusFilter === "Packed" ? item.packedStatus === "Packed" : item.packedStatus !== "Packed"
-    const matchType     = typeFilter === "All" ? true : typeFilter === "Required" ? item.requiredStatus === "Required" : item.requiredStatus !== "Required"
+const filteredItems = items.filter(item => {
+    const matchCategory =
+      selectedCategory === "All" || !selectedCategory
+        ? true
+        : item.category === selectedCategory
+
+    const matchSearch = item.name
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase())
+
+    const matchStatus =
+      statusFilter === "All"
+        ? true
+        : statusFilter === "Packed"
+          ? item.packedStatus === "Packed"
+          : item.packedStatus !== "Packed"
+
+    const matchType =
+      typeFilter === "All"
+        ? true
+        : typeFilter === "Required"
+          ? item.requiredStatus === "Required"
+          : item.requiredStatus !== "Required"
+
     return matchCategory && matchSearch && matchStatus && matchType
   })
 
