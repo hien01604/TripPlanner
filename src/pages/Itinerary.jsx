@@ -158,7 +158,7 @@ const Itinerary = () => {
 
   const handleExportJson = () => {
     const tripPlan = {
-      trip: "Japan",
+      trip: "Trip",
       exportedAt: new Date().toISOString(),
       lastModified,
       activities,
@@ -172,7 +172,7 @@ const Itinerary = () => {
     const link = document.createElement("a");
 
     link.href = url;
-    link.download = "japan-itinerary.json";
+    link.download = "itinerary.json";
     link.click();
 
     URL.revokeObjectURL(url);

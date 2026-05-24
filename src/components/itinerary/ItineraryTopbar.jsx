@@ -1,4 +1,3 @@
-import { FiChevronRight } from "react-icons/fi";
 import { formatLastModified } from "../../data/itineraryUtils";
 import "../../style/itinerary/ItineraryTopbar.css";
 
@@ -6,8 +5,6 @@ const ItineraryTopbar = ({ lastModified }) => {
   return (
     <div className="itinerary-topbar">
       <div className="breadcrumb">
-        <span>Japan</span>
-        <FiChevronRight />
         <strong>Itinerary</strong>
       </div>
 
