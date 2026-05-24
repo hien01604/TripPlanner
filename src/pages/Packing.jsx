@@ -22,7 +22,7 @@ function Packing({ selectedTripIndex = 0 }) {
   const [typeFilter, setTypeFilter] = useState("All")
   const [openModal, setOpenModal] = useState(false)
   const [editingItem, setEditingItem] = useState(null)
-
+  const trips = useSelector((state) => state.trip.trips)
   const totalItems    = items.length
   const packedItems   = items.filter(item => item.packedStatus === "Packed").length
   const requiredItems = items.filter(item => item.requiredStatus === "Required").length
@@ -32,10 +32,31 @@ function Packing({ selectedTripIndex = 0 }) {
 
   const deleteItem = (id) => dispatch(deletePackingItem({ tripIndex, itemId: id }))
 
-  const addItem = (newItem) => dispatch(addPackingItem({
-    tripIndex,
-    item: { ...newItem, id: Date.now(), packedStatus: "Not Packed" }
-  }))
+const addItem = (newItem) => {
+  const currentPackingList = trips[tripIndex]?.packingList || []
+
+  const isDuplicate = currentPackingList.some(
+    (item) =>
+      item.name.trim().toLowerCase() === newItem.name.trim().toLowerCase()
+  )
+
+  if (isDuplicate) {
+    return false
+  }
+
+  dispatch(
+    addPackingItem({
+      tripIndex,
+      item: {
+        ...newItem,
+        id: Date.now(),
+        packedStatus: "Not Packed",
+      },
+    })
+  )
+
+  return true
+}
 
   const updateItem = (updatedItem) => dispatch(updatePackingItem({ tripIndex, item: updatedItem }))
 

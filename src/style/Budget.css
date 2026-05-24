@@ -79,18 +79,19 @@
 }
 
 .modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(0,0,0,0.4);
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.4);
 
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 
-    z-index: 1000;
+  z-index: 1000;
+  padding: 16px;
+  box-sizing: border-box;
 }
 
 .primary-btn {
@@ -158,12 +159,12 @@
 }
 
 .add-budget-dialog {
-    width: 90%;
-    max-width: 500px;
-    padding: 20px;
-    border: 1px solid #ddd;
-    border-radius: 12px;
-    background-color: white;
+  width: min(460px, calc(100vw - 32px));
+  background: white;
+  border-radius: 18px;
+  padding: 22px;
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.22);
+  box-sizing: border-box;
 }
 
 .edit-budget-dialog {
@@ -177,10 +178,12 @@
 
 .edit-budget-dialog,
 .edit-form-input {
-    padding: 10px 12px;
-    border: 1px solid #ccc;
-    border-radius: 12px;
-    font-size: 14px;
+  width: min(460px, calc(100vw - 32px));
+  background: white;
+  border-radius: 18px;
+  padding: 22px;
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.22);
+  box-sizing: border-box;
 }
 
 .tertiary-btn {
@@ -198,8 +201,9 @@
 }
 
 .budget-form {
-    display: grid;
-    gap: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .budget-form input,

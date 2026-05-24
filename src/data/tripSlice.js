@@ -249,23 +249,35 @@ const tripSlice = createSlice({
       localStorage.setItem("tripData", JSON.stringify(state));
     },
 
-    addPackingItem: (state, action) => {
-      try {
-        const raw = localStorage.getItem("tripData_history");
-        const history = raw ? JSON.parse(raw) : [];
-        history.push({ trips: JSON.parse(JSON.stringify(state.trips)) });
-        if (history.length > 50) history.shift();
-        localStorage.setItem("tripData_history", JSON.stringify(history));
-      } catch { }
-      const { tripIndex, item } = action.payload;
+addPackingItem: (state, action) => {
+  try {
+    const raw = localStorage.getItem("tripData_history");
+    const history = raw ? JSON.parse(raw) : [];
+    history.push({ trips: JSON.parse(JSON.stringify(state.trips)) });
+    if (history.length > 50) history.shift();
+    localStorage.setItem("tripData_history", JSON.stringify(history));
+  } catch { }
 
-      if (!state.trips[tripIndex].packingList) {
-        state.trips[tripIndex].packingList = [];
-      }
+  const { tripIndex, item } = action.payload;
+  const trip = state.trips[tripIndex];
 
-      state.trips[tripIndex].packingList.push(item);
-      localStorage.setItem("tripData", JSON.stringify(state));
-    },
+  if (!trip) return;
+
+  if (!trip.packingList) {
+    trip.packingList = [];
+  }
+
+  const isDuplicate = trip.packingList.some(
+    packingItem =>
+      packingItem.name.trim().toLowerCase() === item.name.trim().toLowerCase()
+  );
+
+  if (isDuplicate) return;
+
+  trip.packingList.push(item);
+
+  localStorage.setItem("tripData", JSON.stringify(state));
+},
 
     deletePackingItem: (state, action) => {
       try {
