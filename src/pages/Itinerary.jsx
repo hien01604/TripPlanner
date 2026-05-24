@@ -22,10 +22,9 @@ import {
   saveActivity,
 } from "../data/tripSlice";
 
-const Itinerary = () => {
+const Itinerary = ({ selectedTripIndex = 0 }) => {
   const todayDate = formatLocalDate(new Date());
   const dispatch = useDispatch();
-  const selectedTripIndex = 0;
   const activities = useSelector(
     (state) => state.trip.trips[selectedTripIndex]?.itinerary || []
   );
