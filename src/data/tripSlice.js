@@ -151,6 +151,83 @@ const tripSlice = createSlice({
       localStorage.setItem("tripData", JSON.stringify(state));
     },
 
+    saveActivity: (state, action) => {
+      try {
+        const raw = localStorage.getItem("tripData_history");
+        const history = raw ? JSON.parse(raw) : [];
+        history.push({ trips: JSON.parse(JSON.stringify(state.trips)) });
+        if (history.length > 50) history.shift();
+        localStorage.setItem("tripData_history", JSON.stringify(history));
+      } catch { }
+      const { tripIndex, activity } = action.payload;
+      const trip = state.trips[tripIndex];
+
+      if (!trip) return;
+
+      if (!trip.itinerary) {
+        trip.itinerary = [];
+      }
+
+      const activityToSave = {
+        ...activity,
+        id: activity.id || Date.now(),
+      };
+
+      const activityIndex = trip.itinerary.findIndex(
+        item => item.id === activityToSave.id
+      );
+
+      if (activityIndex >= 0) {
+        trip.itinerary[activityIndex] = activityToSave;
+      } else {
+        trip.itinerary.push(activityToSave);
+      }
+
+      localStorage.setItem("tripData", JSON.stringify(state));
+    },
+
+    deleteActivity: (state, action) => {
+      try {
+        const raw = localStorage.getItem("tripData_history");
+        const history = raw ? JSON.parse(raw) : [];
+        history.push({ trips: JSON.parse(JSON.stringify(state.trips)) });
+        if (history.length > 50) history.shift();
+        localStorage.setItem("tripData_history", JSON.stringify(history));
+      } catch { }
+      const { tripIndex, activityId } = action.payload;
+      const trip = state.trips[tripIndex];
+
+      if (!trip?.itinerary) return;
+
+      trip.itinerary = trip.itinerary.filter(
+        activity => activity.id !== activityId
+      );
+
+      localStorage.setItem("tripData", JSON.stringify(state));
+    },
+
+    changeActivityStatus: (state, action) => {
+      try {
+        const raw = localStorage.getItem("tripData_history");
+        const history = raw ? JSON.parse(raw) : [];
+        history.push({ trips: JSON.parse(JSON.stringify(state.trips)) });
+        if (history.length > 50) history.shift();
+        localStorage.setItem("tripData_history", JSON.stringify(history));
+      } catch { }
+      const { tripIndex, activityId } = action.payload;
+      const statusFlow = ["Planned", "In Progress", "Done"];
+      const activity = state.trips[tripIndex]?.itinerary?.find(
+        item => item.id === activityId
+      );
+
+      if (!activity) return;
+
+      const currentIndex = statusFlow.indexOf(activity.status);
+      activity.status = statusFlow[(currentIndex + 1) % statusFlow.length];
+
+      localStorage.setItem("tripData", JSON.stringify(state));
+    },
+
     togglePackingItem: (state, action) => {
       try {
         const raw = localStorage.getItem("tripData_history");
@@ -349,6 +426,9 @@ export const {
   addTrip,
   updateTrip,
   updateItinerary,
+  saveActivity,
+  deleteActivity,
+  changeActivityStatus,
   togglePackingItem,
   addPackingItem,
   deletePackingItem,
