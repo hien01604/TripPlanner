@@ -18,7 +18,6 @@ import Budget from "../pages/Budget";
 import Dashboard from "../pages/Dashboard";
 import { undoTripData } from "../data/tripSlice";
 
-
 function TripPlanner({
   selectedPage,
   selectedPageForPlanning,
@@ -33,7 +32,6 @@ function TripPlanner({
   const [sidebarsOpen, setSidebarsOpen] = useState(false);
   const showJourneySidebar = sidebarsOpen;
   const showPlanningSidebar = sidebarsOpen && showPlanningShell;
-
   const handleSetSelectedPage = (page) => {
     if (page !== "JourneyManagement") {
       setSidebarsOpen(true);
@@ -58,11 +56,15 @@ function TripPlanner({
         >
           <HiMenu />
         </button>
-        <div className="top-navbar__actions">
-          <button type="button" className="top-navbar__undo" onClick={handleUndoLastAction} aria-label="Undo last action">
-            <IoMdUndo />
-            Undo
-          </button>
+          <div className="top-navbar__actions">
+            <button
+              type="button"
+              className="top-navbar__undo"
+              onClick={handleUndoLastAction}
+            >
+              <IoMdUndo />
+              Undo
+            </button>
           <button type="button" className="top-navbar__bell" aria-label="Notifications">
             <HiOutlineBell />
           </button>

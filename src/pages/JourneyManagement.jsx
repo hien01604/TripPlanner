@@ -151,7 +151,7 @@ function JourneyManagement({
             <MessageBox
                 visible={deleteTargetIndex !== null}
                 title="Delete journey"
-                message={`Delete "${trips[deleteTargetIndex]?.tripName ?? trips[deleteTargetIndex]?.title ?? "this journey"}"? This action cannot be undone.`}
+                message={`Delete "${trips[deleteTargetIndex]?.tripName ?? trips[deleteTargetIndex]?.title ?? "this journey"}"?`}
                 confirmText="Delete"
                 cancelText="Cancel"
                 onConfirm={confirmDeleteJourney}
