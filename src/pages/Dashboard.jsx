@@ -23,6 +23,7 @@ import {
 } from "recharts";
 import "../style/Dashboard.css";
 import BreadCrumb from "../components/BreadCrumb"
+import { isActivityOverdue } from "../data/itineraryUtils";
 
 
 const STAT_ICON_COMPONENTS = {
@@ -248,11 +249,20 @@ const packingCategories = defaultCategoryPacking.map((label) => {
     return { category: label, amount };
   });
 
-  const itineraryDoneCount = itinerary.filter(
-    (item) => item.status === "Completed"
-  ).length;
-  const itineraryPercent =
-    itinerary.length > 0 ? Math.round((itineraryDoneCount / itinerary.length) * 100) : 0;
+  const itineraryDoneCount = itinerary.filter((item) => {
+  const status = String(item.status || "").toLowerCase();
+
+  return (
+    status === "done" ||
+    status === "completed" ||
+    item.completed === true
+  );
+}).length;
+
+const itineraryPercent =
+  itinerary.length > 0
+    ? Math.round((itineraryDoneCount / itinerary.length) * 100)
+    : 0;
 
   const packingPercent =
     packingTotal > 0 ? Math.round((packingPacked / packingTotal) * 100) : 0;
@@ -261,13 +271,7 @@ const packingCategories = defaultCategoryPacking.map((label) => {
     (item) => item.paymentStatus !== "Paid"
   ).length;
 
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const overdueCount = itinerary.filter((item) => {
-    const d = new Date(item.date);
-    d.setHours(0, 0, 0, 0);
-    return d < today && item.status !== "Completed";
-  }).length;
+  const overdueCount = itinerary.filter(isActivityOverdue).length;
 
   const stats = [
     {
@@ -372,7 +376,7 @@ const packingCategories = defaultCategoryPacking.map((label) => {
       <div className="stats-cards">
         {stats.length === 0 ? (
           <p className="dashboard-empty-inline">
-            Chưa có thẻ thống kê. Hãy kiểm tra dữ liệu trong <code>localStorage.tripData</code>.
+            No statistics card yet <code>localStorage.tripData</code>.
           </p>
         ) : (
           stats.map((card) => {
