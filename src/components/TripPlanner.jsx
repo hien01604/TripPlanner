@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import JourneyManagement from "../pages/JourneyManagement";
 import { useDispatch } from "react-redux";
 import {
@@ -7,7 +7,6 @@ import {
   HiOutlineDotsVertical,
 } from "react-icons/hi";
 import { IoMdUndo } from "react-icons/io";
-
 
 import JourneySidebar from "./JourneySidebar";
 import PlanningSidebar from "./PlanningSidebar";
@@ -28,10 +27,15 @@ function TripPlanner({
   setJourneyManagementAction,
 }) {
   const dispatch = useDispatch();
+
+  const contentRef = useRef(null);
+
   const showPlanningShell = selectedPage !== "JourneyManagement";
   const [sidebarsOpen, setSidebarsOpen] = useState(false);
+
   const showJourneySidebar = sidebarsOpen;
   const showPlanningSidebar = sidebarsOpen && showPlanningShell;
+
   const handleSetSelectedPage = (page) => {
     if (page !== "JourneyManagement") {
       setSidebarsOpen(true);
@@ -39,6 +43,13 @@ function TripPlanner({
 
     setSelectedPage(page);
   };
+
+  useEffect(() => {
+    contentRef.current?.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  }, [selectedPage, selectedTripIndex]);
 
   const handleUndoLastAction = () => {
     dispatch(undoTripData());
@@ -56,19 +67,30 @@ function TripPlanner({
         >
           <HiMenu />
         </button>
-          <div className="top-navbar__actions">
-            <button
-              type="button"
-              className="top-navbar__undo"
-              onClick={handleUndoLastAction}
-            >
-              <IoMdUndo />
-              Undo
-            </button>
-          <button type="button" className="top-navbar__bell" aria-label="Notifications">
+
+        <div className="top-navbar__actions">
+          <button
+            type="button"
+            className="top-navbar__undo"
+            onClick={handleUndoLastAction}
+          >
+            <IoMdUndo />
+            Undo
+          </button>
+
+          <button
+            type="button"
+            className="top-navbar__bell"
+            aria-label="Notifications"
+          >
             <HiOutlineBell />
           </button>
-          <button type="button" className="top-navbar__avatar" aria-label="User menu">
+
+          <button
+            type="button"
+            className="top-navbar__avatar"
+            aria-label="User menu"
+          >
             <img
               src="https://i.pravatar.cc/40?img=12"
               alt=""
@@ -80,7 +102,6 @@ function TripPlanner({
       </header>
 
       <div className="dashboard-body">
-        {/* Desktop */}
         {showJourneySidebar && (
           <JourneySidebar
             selectedPage={selectedPage}
@@ -99,38 +120,39 @@ function TripPlanner({
           />
         )}
 
-        <main className="dashboard-content">
-  {selectedPage === "Dashboard" && (
-    <Dashboard
-      selectedTripIndex={selectedTripIndex}
-      setSelectedPage={handleSetSelectedPage}
-    />
-  )}
+        <main className="dashboard-content" ref={contentRef}>
+          {selectedPage === "Dashboard" && (
+            <Dashboard
+              selectedTripIndex={selectedTripIndex}
+              setSelectedPage={handleSetSelectedPage}
+            />
+          )}
 
-  {selectedPage === "JourneyManagement" && (
-    <JourneyManagement
-      selectedTripIndex={selectedTripIndex}
-      setSelectedTripIndex={setSelectedTripIndex}
-      setSelectedPage={handleSetSelectedPage}
-      journeyManagementAction={journeyManagementAction}
-      setJourneyManagementAction={setJourneyManagementAction}
-    />
-  )}
+          {selectedPage === "JourneyManagement" && (
+            <JourneyManagement
+              selectedTripIndex={selectedTripIndex}
+              setSelectedTripIndex={setSelectedTripIndex}
+              setSelectedPage={handleSetSelectedPage}
+              journeyManagementAction={journeyManagementAction}
+              setJourneyManagementAction={setJourneyManagementAction}
+            />
+          )}
 
-  {selectedPage === "Itinerary" && (
-    <Itinerary selectedTripIndex={selectedTripIndex} />
-  )}
+          {selectedPage === "Itinerary" && (
+            <Itinerary selectedTripIndex={selectedTripIndex} />
+          )}
 
-  {selectedPage === "Packing" && (
-    <Packing selectedTripIndex={selectedTripIndex} />
-  )}
+          {selectedPage === "Packing" && (
+            <Packing selectedTripIndex={selectedTripIndex} />
+          )}
 
-  {selectedPage === "Budget" && (
-    <Budget selectedTripIndex={selectedTripIndex} />
-  )}
-</main>
+          {selectedPage === "Budget" && (
+            <Budget selectedTripIndex={selectedTripIndex} />
+          )}
+        </main>
       </div>
     </div>
   );
 }
-export default TripPlanner
+
+export default TripPlanner;
