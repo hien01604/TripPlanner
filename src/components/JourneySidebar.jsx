@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { FaEdit, FaPlus, FaSuitcaseRolling, FaTrash } from "react-icons/fa";
 import { HiOutlineDotsVertical } from "react-icons/hi";
@@ -21,6 +21,46 @@ function JourneySidebar({
   const [searchTerm, setSearchTerm] = useState("");
   const [deleteTargetIndex, setDeleteTargetIndex] = useState(null);
   const openMenuRef = useRef(null);
+
+  // --- Resizable sidebar logic ---
+  const SIDEBAR_MIN_WIDTH = 160;
+  const SIDEBAR_MAX_WIDTH = 480;
+  const SIDEBAR_DEFAULT_WIDTH = 220;
+  const [sidebarWidth, setSidebarWidth] = useState(SIDEBAR_DEFAULT_WIDTH);
+  const isResizing = useRef(false);
+  const sidebarRef = useRef(null);
+
+  const handleResizeMouseDown = useCallback((event) => {
+    event.preventDefault();
+    isResizing.current = true;
+    document.body.style.cursor = "col-resize";
+    document.body.style.userSelect = "none";
+  }, []);
+
+  useEffect(() => {
+    const handleMouseMove = (event) => {
+      if (!isResizing.current || !sidebarRef.current) return;
+
+      const sidebarLeft = sidebarRef.current.getBoundingClientRect().left;
+      const newWidth = Math.min(SIDEBAR_MAX_WIDTH, Math.max(SIDEBAR_MIN_WIDTH, event.clientX - sidebarLeft));
+      setSidebarWidth(newWidth);
+    };
+
+    const handleMouseUp = () => {
+      if (!isResizing.current) return;
+      isResizing.current = false;
+      document.body.style.cursor = "";
+      document.body.style.userSelect = "";
+    };
+
+    document.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("mouseup", handleMouseUp);
+
+    return () => {
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, []);
   const editingTrip = editingIndex !== null ? trips[editingIndex] : null;
 
   useEffect(() => {
@@ -116,7 +156,7 @@ function JourneySidebar({
   };
 
   return (
-    <div className="sidebar">
+    <div className="sidebar" ref={sidebarRef} style={{ width: sidebarWidth }}>
       <h3 className="sidebar-title">JOURNEY</h3>
       <input
         className="search-input"
@@ -239,6 +279,11 @@ function JourneySidebar({
         cancelText="Cancel"
         onConfirm={confirmDeleteJourney}
         onCancel={cancelDeleteJourney}
+      />
+      <div
+        className="sidebar-resize-handle"
+        onMouseDown={handleResizeMouseDown}
+        title="Drag to resize"
       />
     </div>
   );
