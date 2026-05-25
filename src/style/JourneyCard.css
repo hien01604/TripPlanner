@@ -1,0 +1,211 @@
+.journey-card {
+    position: relative;
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+    background: #fff;
+    overflow: hidden;
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.07);
+    cursor: pointer;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.journey-card:hover {
+    transform: translateY(-3px);
+    border-color: #99f6e4;
+    box-shadow: 0 18px 34px rgba(15, 23, 42, 0.12);
+}
+
+.journey-card.active {
+    border-color: #14b8a6;
+    box-shadow: 0 18px 34px rgba(20, 184, 166, 0.16);
+}
+
+.journey-card-actions {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 2;
+}
+
+.journey-card-menu-btn {
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.94);
+    color: #334155;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    box-shadow: 0 6px 14px rgba(15, 23, 42, 0.12);
+}
+
+.journey-card-menu-btn:hover {
+    background: #fff;
+    color: #0f766e;
+}
+
+.journey-card-menu {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    min-width: 140px;
+    padding: 6px;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    background: #fff;
+    box-shadow: 0 16px 32px rgba(15, 23, 42, 0.12);
+}
+
+.journey-card-menu__item {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: #334155;
+    cursor: pointer;
+    font-size: 13px;
+    text-align: left;
+}
+
+.journey-card-menu__item:hover {
+    background: #f1f5f9;
+}
+
+.journey-card-menu__item--danger {
+    color: #dc2626;
+}
+
+.journey-card-menu__item--danger:hover {
+    background: #fee2e2;
+}
+
+.journey-thumbnail-wrapper {
+    position: relative;
+    height: 132px;
+    background: linear-gradient(135deg, #ecfeff 0%, #f0fdfa 48%, #eef2ff 100%);
+    overflow: hidden;
+}
+
+.journey-thumbnail,
+.journey-thumbnail-default {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: grid;
+    place-items: center;
+    color: #0f766e;
+    font-size: 24px;
+}
+
+.journey-thumbnail {
+    transition: transform 0.35s ease;
+}
+
+.journey-card:hover .journey-thumbnail {
+    transform: scale(1.04);
+}
+
+.journey-thumbnail-default {
+    background:
+        radial-gradient(circle at 24% 20%, rgba(20, 184, 166, 0.28), transparent 30%),
+        radial-gradient(circle at 80% 10%, rgba(59, 130, 246, 0.16), transparent 28%),
+        linear-gradient(135deg, #ecfeff 0%, #f8fafc 100%);
+}
+
+.journey-thumbnail-default__icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 14px;
+    display: grid;
+    place-items: center;
+    background: rgba(255, 255, 255, 0.8);
+    color: #0f766e;
+    box-shadow: 0 12px 26px rgba(15, 23, 42, 0.1);
+}
+
+.journey-thumbnail-shade {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(15, 23, 42, 0.02) 30%, rgba(15, 23, 42, 0.2) 100%);
+    pointer-events: none;
+}
+
+.journey-card-content {
+    min-height: 154px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.journey-card-main {
+    flex: 1;
+    min-height: 0;
+}
+
+.journey-card-title {
+    font-size: 17px;
+    font-weight: 700;
+    line-height: 1.25;
+    color: #111827;
+    margin: 0 0 7px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.journey-card-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    padding-top: 12px;
+    border-top: 1px solid #f1f5f9;
+}
+
+.journey-card-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    max-width: 100%;
+    padding: 6px 9px;
+    border-radius: 999px;
+    background: #f8fafc;
+    color: #475569;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.journey-card-pill svg {
+    flex-shrink: 0;
+    font-size: 11px;
+}
+
+.journey-card-pill--budget {
+    background: #ecfdf5;
+    color: #0f766e;
+}
+
+.journey-card-note {
+    display: -webkit-box;
+    margin: 0;
+    color: #64748b;
+    font-size: 13px;
+    line-height: 1.5;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+}
+
+.journey-card-note--empty {
+    color: #94a3b8;
+    font-style: italic;
+}

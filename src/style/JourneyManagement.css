@@ -1,0 +1,238 @@
+.journey-management {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    width: 100%;
+}
+
+.journey-management__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.journey-management__eyebrow {
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #6b7280;
+    margin-bottom: 8px;
+}
+
+.journey-management__title {
+    font-size: 32px;
+    line-height: 1.1;
+    color: #111827;
+    margin: 0;
+}
+
+.journey-management__subtitle {
+    margin-top: 10px;
+    color: #6b7280;
+    max-width: 560px;
+}
+
+.journey-management__create,
+.journey-card__edit,
+.journey-modal__primary,
+.journey-modal__secondary,
+.journey-modal__close,
+.journey-create-card {
+    border: none;
+    cursor: pointer;
+}
+
+.journey-management__create {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 18px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #0f766e, #14b8a6);
+    color: #fff;
+    font-weight: 600;
+    box-shadow: 0 12px 24px rgba(20, 184, 166, 0.2);
+}
+
+.journey-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
+}
+
+.journey-create-card,
+.journey-card {
+    border-radius: 12px;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.06);
+}
+
+.journey-create-card {
+    min-height: 254px;
+    display: grid;
+    place-items: center;
+    gap: 14px;
+    background: linear-gradient(180deg, #f0fdfa, #ffffff);
+    color: #0f766e;
+    font-weight: 700;
+}
+
+.create-icon,
+.journey-card__icon {
+    width: 54px;
+    height: 54px;
+    border-radius: 16px;
+    display: grid;
+    place-items: center;
+    background: rgba(20, 184, 166, 0.12);
+    color: #0f766e;
+    font-size: 22px;
+}
+
+.journey-card {
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.journey-card.active {
+    border-color: #14b8a6;
+    box-shadow: 0 14px 34px rgba(20, 184, 166, 0.12);
+}
+
+.journey-card__body {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    background: transparent;
+    padding: 0;
+    text-align: left;
+    color: inherit;
+}
+
+.journey-card__content h2 {
+    font-size: 18px;
+    color: #111827;
+    margin-bottom: 6px;
+}
+
+.journey-card__content p {
+    font-size: 14px;
+    color: #0f766e;
+    font-weight: 600;
+}
+
+.journey-card__content span {
+    display: inline-block;
+    margin-top: 6px;
+    font-size: 12px;
+    color: #6b7280;
+}
+
+.journey-card__edit {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 10px 14px;
+    border-radius: 12px;
+    background: #f8fafc;
+    color: #374151;
+}
+
+.journey-modal__backdrop {
+    position: fixed;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    background: rgba(15, 23, 42, 0.5);
+    z-index: 50;
+}
+
+.journey-modal {
+    width: min(100%, 480px);
+    background: #fff;
+    border-radius: 24px;
+    padding: 24px;
+    box-shadow: 0 24px 60px rgba(15, 23, 42, 0.22);
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.journey-modal__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.journey-modal__header h2 {
+    font-size: 24px;
+    color: #111827;
+    margin: 0;
+}
+
+.journey-modal__close {
+    width: 38px;
+    height: 38px;
+    border-radius: 999px;
+    background: #f3f4f6;
+    color: #374151;
+}
+
+.journey-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.journey-field span {
+    font-size: 14px;
+    font-weight: 600;
+    color: #374151;
+}
+
+.journey-field input {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: 1px solid #d1d5db;
+    font-size: 14px;
+    outline: none;
+}
+
+.journey-field input:focus {
+    border-color: #14b8a6;
+    box-shadow: 0 0 0 4px rgba(20, 184, 166, 0.12);
+}
+
+.journey-modal__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 6px;
+}
+
+.journey-modal__secondary,
+.journey-modal__primary {
+    padding: 11px 16px;
+    border-radius: 12px;
+    font-weight: 600;
+}
+
+.journey-modal__secondary {
+    background: #f3f4f6;
+    color: #374151;
+}
+
+.journey-modal__primary {
+    background: linear-gradient(135deg, #0f766e, #14b8a6);
+    color: #fff;
+}

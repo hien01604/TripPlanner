@@ -1,21 +1,23 @@
-import { FaChartBar, FaRoute, FaSuitcase, FaMoneyBill } from "react-icons/fa"
-import "../style/PlanningSidebar.css"
+import { FaChartBar, FaRoute, FaSuitcase, FaMoneyBill } from "react-icons/fa";
+import "../style/PlanningSidebar.css";
 
 const menuItem = [
   { title: "Dashboard", icon: <FaChartBar /> },
   { title: "Itinerary", icon: <FaRoute /> },
-  { title: "Packing",   icon: <FaSuitcase /> },
-  { title: "Budget",    icon: <FaMoneyBill /> },
-]
+  { title: "Packing", icon: <FaSuitcase /> },
+  { title: "Budget", icon: <FaMoneyBill /> },
+];
 
-function PlanningSidebar({ selectedPage, setSelectedPage }) {
+function PlanningSidebar({ selectedPage, setSelectedPage}) {
+
   return (
     <div className="planning-sidebar">
-      <h3 className="sidebar-title">PLANNING</h3>
-
+      <h3 className="sidebar-title">
+        PLANNING 
+      </h3>
       <div className="planning-list">
         {menuItem.map((item) => {
-          const isActive = selectedPage === item.title
+          const isActive = selectedPage === item.title;
           return (
             <div
               key={item.title}
@@ -27,11 +29,11 @@ function PlanningSidebar({ selectedPage, setSelectedPage }) {
                 <span>{item.title}</span>
               </div>
             </div>
-          )
+          );
         })}
       </div>
     </div>
-  )
+  );
 }
 
-export default PlanningSidebar
+export default PlanningSidebar;

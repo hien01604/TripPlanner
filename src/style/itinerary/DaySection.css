@@ -1,0 +1,42 @@
+.day-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 22px 0 14px;
+}
+
+.day-section h2 {
+  margin: 0;
+  color: #346869;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.day-section p {
+  margin: 4px 0 0;
+  color: #777;
+  font-size: 16px;
+}
+
+.day-controls {
+  display: flex;
+  gap: 18px;
+}
+
+.day-controls button {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid #346869;
+  background: white;
+  color: #346869;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  font-size: 20px;
+}
+
+.day-controls button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}

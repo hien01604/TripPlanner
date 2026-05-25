@@ -1,187 +1,42 @@
-import React, { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import ActivityModal from "../components/itinerary/ActivityModal";
+import ActivityTimeline from "../components/itinerary/ActivityTimeline";
+import DaySection from "../components/itinerary/DaySection";
+import DaysStrip from "../components/itinerary/DaysStrip";
+import ItineraryHeader from "../components/itinerary/ItineraryHeader";
+import ItineraryToolbar from "../components/itinerary/ItineraryToolbar";
+import ItineraryTopbar from "../components/itinerary/ItineraryTopbar";
 import {
-  FaCalendarAlt,
-  FaCheck,
-  FaEdit,
-  FaRegCircle,
-  FaTrash,
-  FaUpload,
-} from "react-icons/fa";
-import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
+  emptyForm,
+  formatLocalDate,
+  getDaysInMonth,
+  getMonthFromDate,
+  getTimeInMinutes,
+  LAST_MODIFIED_KEY,
+} from "../data/itineraryUtils";
 import "../style/Itinerary.css";
+import {
+  changeActivityStatus,
+  deleteActivity,
+  saveActivity,
+} from "../data/tripSlice";
 
-const emptyForm = {
-  title: "",
-  location: "",
-  date: "2026-05-13",
-  time: "20:45",
-  category: "Transport",
-  priority: "Medium",
-  status: "Planned",
-};
-
-const initialActivities = [
-  {
-    id: 1,
-    title: "Flight to AHAHAH",
-    location: "Tokyo, Japan",
-    date: "2026-05-13",
-    time: "20:45",
-    category: "Transport",
-    priority: "High",
-    status: "Done",
-  },
-  {
-    id: 2,
-    title: "Hotel Check-in",
-    location: "Tokyo, Japan",
-    date: "2026-05-13",
-    time: "21:30",
-    category: "Hotel",
-    priority: "Medium",
-    status: "Planned",
-  },
-  {
-    id: 3,
-    title: "Dinner at Sushi Bar",
-    location: "Tokyo, Japan",
-    date: "2026-05-13",
-    time: "19:00",
-    category: "Food",
-    priority: "Low",
-    status: "In Progress",
-  },
-];
-
-const STORAGE_KEY = "tripplanner-itinerary-activities";
-const LAST_MODIFIED_KEY = "tripplanner-itinerary-last-modified";
-
-const formatLocalDate = (date) => {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-
-  return `${year}-${month}-${day}`;
-};
-
-const getMonthFromDate = (dateString) => {
-  return dateString.slice(0, 7);
-};
-
-const getDaysInMonth = (monthString) => {
-  const [year, month] = monthString.split("-").map(Number);
-  const totalDays = new Date(year, month, 0).getDate();
-
-  return Array.from({ length: totalDays }, (_, index) => {
-    const date = new Date(year, month - 1, index + 1);
-
-    return {
-      day: index + 1,
-      weekday: date.toLocaleDateString("en-US", { weekday: "short" }),
-      date: formatLocalDate(date),
-    };
-  });
-};
-
-const formatHeadingDate = (dateString) => {
-  const [year, month, day] = dateString.split("-").map(Number);
-  const date = new Date(year, month - 1, day);
-
-  return date.toLocaleDateString("en-US", {
-    weekday: "long",
-    month: "long",
-    day: "numeric",
-  });
-};
-
-const formatTime = (time) => {
-  if (!time) return "";
-
-  const normalizedTime = time.trim();
-
-  if (normalizedTime.includes("AM") || normalizedTime.includes("PM")) {
-    return normalizedTime;
-  }
-
-  const [hourValue, minute] = normalizedTime.split(":");
-  const hour = Number(hourValue);
-  const suffix = hour >= 12 ? "PM" : "AM";
-  const displayHour = hour % 12 || 12;
-
-  return `${String(displayHour).padStart(2, "0")}:${minute} ${suffix}`;
-};
-
-const getTimeInMinutes = (time) => {
-  if (!time) return 0;
-
-  const normalizedTime = time.trim();
-
-  if (normalizedTime.includes("AM") || normalizedTime.includes("PM")) {
-    const [timePart, period] = normalizedTime.split(" ");
-    const [hourValue, minuteValue] = timePart.split(":").map(Number);
-
-    let hour = hourValue;
-
-    if (period === "PM" && hour !== 12) {
-      hour += 12;
-    }
-
-    if (period === "AM" && hour === 12) {
-      hour = 0;
-    }
-
-    return hour * 60 + minuteValue;
-  }
-
-  const [hourValue, minuteValue] = normalizedTime.split(":").map(Number);
-  return hourValue * 60 + minuteValue;
-};
-
-const formatLastModified = (dateString) => {
-  if (!dateString) return "Never modified";
-
-  const date = new Date(dateString);
-
-  const day = String(date.getDate()).padStart(2, "0");
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const year = date.getFullYear();
-
-  const hour = String(date.getHours()).padStart(2, "0");
-  const minute = String(date.getMinutes()).padStart(2, "0");
-
-  return `${day}/${month}/${year}, ${hour}:${minute}`;
-};
-
-const isActivityOverdue = (activity) => {
-  if (activity.status === "Done") return false;
-
-  const activityDateTime = new Date(`${activity.date}T${activity.time}`);
-  return activityDateTime < new Date();
-};
-
-const Itinerary = () => {
-  const [activities, setActivities] = useState(() => {
-    const savedActivities = localStorage.getItem(STORAGE_KEY);
-
-    if (!savedActivities) {
-      return initialActivities;
-    }
-
-    try {
-      return JSON.parse(savedActivities);
-    } catch {
-      return initialActivities;
-    }
-  });
+const Itinerary = ({ selectedTripIndex = 0 }) => {
+  const todayDate = formatLocalDate(new Date());
+  const dispatch = useDispatch();
+  const activities = useSelector(
+    (state) => state.trip.trips[selectedTripIndex]?.itinerary || []
+  );
 
   const [lastModified, setLastModified] = useState(() => {
     return localStorage.getItem(LAST_MODIFIED_KEY) || new Date().toISOString();
   });
 
-  const [selectedDate, setSelectedDate] = useState("2026-05-13");
+  const [selectedDate, setSelectedDate] = useState(todayDate);
 
   const [filters, setFilters] = useState({
-    month: "2026-05",
+    month: getMonthFromDate(todayDate),
     category: "",
     status: "",
     priority: "",
@@ -190,10 +45,6 @@ const Itinerary = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingActivity, setEditingActivity] = useState(null);
   const [form, setForm] = useState(emptyForm);
-
-  useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(activities));
-  }, [activities]);
 
   const days = useMemo(() => getDaysInMonth(filters.month), [filters.month]);
 
@@ -256,21 +107,19 @@ const Itinerary = () => {
     event.preventDefault();
 
     if (editingActivity) {
-      setActivities((prev) =>
-        prev.map((activity) =>
-          activity.id === editingActivity.id
-            ? { ...form, id: editingActivity.id }
-            : activity
-        )
+      dispatch(
+        saveActivity({
+          tripIndex: selectedTripIndex,
+          activity: { ...form, id: editingActivity.id },
+        })
       );
     } else {
-      setActivities((prev) => [
-        ...prev,
-        {
-          ...form,
-          id: Date.now(),
-        },
-      ]);
+      dispatch(
+        saveActivity({
+          tripIndex: selectedTripIndex,
+          activity: form,
+        })
+      );
     }
 
     setFilters((prev) => ({
@@ -287,36 +136,28 @@ const Itinerary = () => {
     const confirmed = window.confirm("Delete this itinerary item?");
     if (!confirmed) return;
 
-    setActivities((prev) =>
-      prev.filter((activity) => activity.id !== activityId)
+    dispatch(
+      deleteActivity({
+        tripIndex: selectedTripIndex,
+        activityId,
+      })
     );
-
     updateLastModified();
   };
 
   const handleChangeStatus = (activityId) => {
-    const statusFlow = ["Planned", "In Progress", "Done"];
-
-    setActivities((prev) =>
-      prev.map((activity) => {
-        if (activity.id !== activityId) return activity;
-
-        const currentIndex = statusFlow.indexOf(activity.status);
-        const nextStatus = statusFlow[(currentIndex + 1) % statusFlow.length];
-
-        return {
-          ...activity,
-          status: nextStatus,
-        };
+    dispatch(
+      changeActivityStatus({
+        tripIndex: selectedTripIndex,
+        activityId,
       })
     );
-
     updateLastModified();
   };
 
   const handleExportJson = () => {
     const tripPlan = {
-      trip: "Japan",
+      trip: "Trip",
       exportedAt: new Date().toISOString(),
       lastModified,
       activities,
@@ -330,7 +171,7 @@ const Itinerary = () => {
     const link = document.createElement("a");
 
     link.href = url;
-    link.download = "japan-itinerary.json";
+    link.download = "itinerary.json";
     link.click();
 
     URL.revokeObjectURL(url);
@@ -350,277 +191,46 @@ const Itinerary = () => {
 
   return (
     <div className="itinerary-page">
-      <div className="itinerary-topbar">
-        <div className="breadcrumb">
-          <span>Japan</span>
-          <FiChevronRight />
-          <strong>Itinerary</strong>
-        </div>
-
-        <div className="last-modified">
-          <span className="status-dot"></span>
-          Last modified at {formatLastModified(lastModified)}
-        </div>
-      </div>
-
-      <div className="itinerary-header">
-        <div>
-          <h1>Itinerary</h1>
-          <p>{filteredActivities.length} activities planned</p>
-        </div>
-
-        <div className="header-actions">
-          <button className="export-btn" onClick={handleExportJson}>
-            <FaUpload />
-            Export
-          </button>
-
-          <button className="add-btn" onClick={openAddModal}>
-            + Add Activity
-          </button>
-        </div>
-      </div>
-
-      <div className="itinerary-toolbar">
-        <label className="date-filter">
-          <span>Month</span>
-          <input
-            type="month"
-            value={filters.month}
-            onChange={handleMonthChange}
-          />
-          <FaCalendarAlt />
-        </label>
-
-        <select
-          value={filters.category}
-          onChange={(e) =>
-            setFilters({ ...filters, category: e.target.value })
-          }
-        >
-          <option value="">Category</option>
-          <option value="Transport">Transport</option>
-          <option value="Food">Food</option>
-          <option value="Sightseeing">Sightseeing</option>
-          <option value="Shopping">Shopping</option>
-          <option value="Hotel">Hotel</option>
-          <option value="Other">Other</option>
-        </select>
-
-        <select
-          value={filters.status}
-          onChange={(e) =>
-            setFilters({ ...filters, status: e.target.value })
-          }
-        >
-          <option value="">Status</option>
-          <option value="Planned">Planned</option>
-          <option value="In Progress">In Progress</option>
-          <option value="Done">Done</option>
-        </select>
-
-        <select
-          value={filters.priority}
-          onChange={(e) =>
-            setFilters({ ...filters, priority: e.target.value })
-          }
-        >
-          <option value="">Priority</option>
-          <option value="Low">Low</option>
-          <option value="Medium">Medium</option>
-          <option value="High">High</option>
-        </select>
-      </div>
-
-      <div className="days-strip">
-        {days.map((item) => {
-          const hasActivities = activities.some(
-            (activity) => activity.date === item.date
-          );
-
-          return (
-            <button
-              key={item.date}
-              className={`day-item ${
-                selectedDate === item.date ? "selected" : ""
-              } ${hasActivities ? "has-activities" : ""}`}
-              onClick={() => setSelectedDate(item.date)}
-            >
-              <span>{item.day}</span>
-              <small>{item.weekday}</small>
-            </button>
-          );
-        })}
-      </div>
-
-      <div className="day-section">
-        <div>
-          <h2>{formatHeadingDate(selectedDate)}</h2>
-          <p>{filteredActivities.length} items</p>
-        </div>
-
-        <div className="day-controls">
-          <button onClick={handlePrevDay} disabled={selectedDayIndex <= 0}>
-            <FiChevronLeft />
-          </button>
-
-          <button
-            onClick={handleNextDay}
-            disabled={selectedDayIndex === days.length - 1}
-          >
-            <FiChevronRight />
-          </button>
-        </div>
-      </div>
-
-      <div className="activity-timeline">
-        {filteredActivities.length === 0 ? (
-          <div className="empty-state">No activities for this day</div>
-        ) : (
-          filteredActivities.map((activity) => {
-            const statusClass = activity.status
-              .toLowerCase()
-              .replace(/\s+/g, "-");
-
-            const overdue = isActivityOverdue(activity);
-
-            return (
-              <div className="timeline-row" key={activity.id}>
-                <div className="time-column">
-                  <div className="time-pill">{formatTime(activity.time)}</div>
-                  <div className="timeline-line"></div>
-                </div>
-
-                <div
-                  className={`activity-card ${statusClass} ${
-                    overdue ? "overdue" : ""
-                  }`}
-                >
-                  <button
-                    className="check-btn"
-                    title="Change status"
-                    onClick={() => handleChangeStatus(activity.id)}
-                  >
-                    {activity.status === "Done" ? <FaCheck /> : <FaRegCircle />}
-                  </button>
-
-                  <div className="activity-content">
-                    <div className="activity-title-row">
-                      <h3>{activity.title}</h3>
-
-                      <span className={`status-pill ${statusClass}`}>
-                        {activity.status}
-                      </span>
-
-                      {overdue && <span className="overdue-pill">Overdue</span>}
-                    </div>
-
-                    <p>{activity.location}</p>
-
-                    <div className="tag-list">
-                      <span className="category-tag">{activity.category}</span>
-
-                      <span
-                        className={`priority-tag ${activity.priority.toLowerCase()}`}
-                      >
-                        P {activity.priority}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="card-actions">
-                    <button title="Edit" onClick={() => openEditModal(activity)}>
-                      <FaEdit />
-                    </button>
-
-                    <button
-                      title="Delete"
-                      onClick={() => handleDeleteActivity(activity.id)}
-                    >
-                      <FaTrash />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            );
-          })
-        )}
-      </div>
+      <ItineraryTopbar lastModified={lastModified} />
+      <ItineraryHeader
+        activityCount={filteredActivities.length}
+        onAddActivity={openAddModal}
+        onExport={handleExportJson}
+      />
+      <ItineraryToolbar
+        filters={filters}
+        onFilterChange={setFilters}
+        onMonthChange={handleMonthChange}
+      />
+      <DaysStrip
+        activities={activities}
+        days={days}
+        selectedDate={selectedDate}
+        onSelectDate={setSelectedDate}
+      />
+      <DaySection
+        activityCount={filteredActivities.length}
+        isNextDisabled={selectedDayIndex === days.length - 1}
+        isPrevDisabled={selectedDayIndex <= 0}
+        selectedDate={selectedDate}
+        onNextDay={handleNextDay}
+        onPrevDay={handlePrevDay}
+      />
+      <ActivityTimeline
+        activities={filteredActivities}
+        onChangeStatus={handleChangeStatus}
+        onDeleteActivity={handleDeleteActivity}
+        onEditActivity={openEditModal}
+      />
 
       {isModalOpen && (
-        <div className="activity-modal-backdrop">
-          <form className="activity-modal" onSubmit={handleSaveActivity}>
-            <h3>{editingActivity ? "Edit Activity" : "Add Activity"}</h3>
-
-            <input
-              placeholder="Activity title"
-              value={form.title}
-              onChange={(e) => setForm({ ...form, title: e.target.value })}
-              required
-            />
-
-            <input
-              placeholder="Location"
-              value={form.location}
-              onChange={(e) => setForm({ ...form, location: e.target.value })}
-              required
-            />
-
-            <input
-              type="date"
-              value={form.date}
-              onChange={(e) => setForm({ ...form, date: e.target.value })}
-              required
-            />
-
-            <input
-              type="time"
-              value={form.time}
-              onChange={(e) => setForm({ ...form, time: e.target.value })}
-              required
-            />
-
-            <select
-              value={form.category}
-              onChange={(e) => setForm({ ...form, category: e.target.value })}
-            >
-              <option value="Transport">Transport</option>
-              <option value="Food">Food</option>
-              <option value="Sightseeing">Sightseeing</option>
-              <option value="Shopping">Shopping</option>
-              <option value="Hotel">Hotel</option>
-              <option value="Other">Other</option>
-            </select>
-
-            <select
-              value={form.priority}
-              onChange={(e) => setForm({ ...form, priority: e.target.value })}
-            >
-              <option value="Low">Low</option>
-              <option value="Medium">Medium</option>
-              <option value="High">High</option>
-            </select>
-
-            <select
-              value={form.status}
-              onChange={(e) => setForm({ ...form, status: e.target.value })}
-            >
-              <option value="Planned">Planned</option>
-              <option value="In Progress">In Progress</option>
-              <option value="Done">Done</option>
-            </select>
-
-            <div className="modal-actions">
-              <button type="button" onClick={closeModal}>
-                Cancel
-              </button>
-
-              <button type="submit">
-                {editingActivity ? "Save Changes" : "Add Activity"}
-              </button>
-            </div>
-          </form>
-        </div>
+        <ActivityModal
+          editingActivity={editingActivity}
+          form={form}
+          onClose={closeModal}
+          onFormChange={setForm}
+          onSubmit={handleSaveActivity}
+        />
       )}
     </div>
   );

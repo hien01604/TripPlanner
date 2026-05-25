@@ -1,0 +1,63 @@
+.msgbox-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 90;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    background: rgba(15, 23, 42, 0.55);
+    backdrop-filter: blur(6px);
+}
+
+.msgbox-card {
+    width: min(92vw, 420px);
+    border-radius: 20px;
+    background: #ffffff;
+    box-shadow: 0 30px 80px rgba(15, 23, 42, 0.28);
+    overflow: hidden;
+}
+
+.msgbox-header {
+    padding: 20px 22px 0;
+}
+
+.msgbox-header h3 {
+    margin: 0;
+    font-size: 20px;
+    color: #0f172a;
+}
+
+.msgbox-body {
+    padding: 14px 22px 8px;
+}
+
+.msgbox-body p {
+    margin: 0;
+    color: #475569;
+    line-height: 1.6;
+}
+
+.msgbox-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    padding: 18px 22px 22px;
+}
+
+.msgbox-actions button {
+    border: 0;
+    border-radius: 12px;
+    padding: 11px 18px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.msgbox-cancel {
+    background: #e2e8f0;
+    color: #0f172a;
+}
+
+.msgbox-confirm {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: #fff;
+}

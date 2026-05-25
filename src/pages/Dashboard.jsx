@@ -1,17 +1,9 @@
 import { useSelector } from "react-redux";
 import {
-  HiMenu,
-  HiOutlineBell,
-  HiOutlineDotsVertical,
-} from "react-icons/hi";
-import {
-  FiSearch,
-  FiFilter,
   FiCalendar,
   FiChevronLeft,
   FiChevronRight,
 } from "react-icons/fi";
-import { IoMdUndo } from "react-icons/io";
 import {
   FaCalendarAlt,
   FaClipboardList,
@@ -29,10 +21,8 @@ import {
   ResponsiveContainer,
   Legend,
 } from "recharts";
+import "../style/Dashboard.css";
 
-import JourneySidebar from "../../components/JourneySidebar";
-import PlanningSidebar from "../../components/PlanningSidebar";
-import "./Dashboard.css";
 
 
 const STAT_ICON_COMPONENTS = {
@@ -176,13 +166,15 @@ function buildCalendarCells(itinerary) {
   };
 }
 
-export function DashboardMain() {
-  const trip = useSelector((state) => state.trip);
+function Dashboard({ selectedTripIndex = 0, setSelectedPage }) {
+  const trips = useSelector(state => state.trip.trips ?? []);
+  const trip = trips[selectedTripIndex] || {};
+  
   const itinerary = trip?.itinerary ?? [];
   const packingList = trip?.packingList ?? [];
   const budgetItems = trip?.budgetItems ?? [];
 
-  const tripNameDisplay = trip?.tripName?.trim() || "—";
+  const tripNameDisplay = trip.tripName ?? "—";
   const tripDatesDisplay = formatTripDates(itinerary);
 
   const totalBudget = Number(trip?.budget) || 0;
@@ -439,12 +431,11 @@ const packingCategories = defaultCategoryPacking.map((label) => {
             {/* note : Packing hiển thị theo `tripData.packingList` trong localStorage. */}
             <p className="packed-summary">
               <strong>
-              Packed{" "}
+                Packed{" "}
               </strong>
-              <diV>
+              <div>
                 {packingPacked} of {packingTotal} items ready
-
-              </diV>
+              </div>
             </p>
             {packingCategories.map((cat) => (
               <div key={cat.label} className="category-progress">
@@ -535,7 +526,7 @@ const packingCategories = defaultCategoryPacking.map((label) => {
                 style={{ width: `${budgetPercent}%` }}
               />
             </div>
-            <button type="button" className="btn-view-budget">
+            <button type="button" className="btn-view-budget" onClick={() => setSelectedPage("Budget")}>
               View Budget Details
               <span className="btn-arrow" aria-hidden>
                 →
@@ -605,57 +596,6 @@ const packingCategories = defaultCategoryPacking.map((label) => {
             )}
           </div>
         </div>
-      </div>
-    </div>
-  );
-}
-
-function Dashboard({ selectedPage, setSelectedPage, children }) {
-  return (
-    <div className="dashboard-shell">
-      <header className="top-navbar">
-        <button type="button" className="top-navbar__menu" aria-label="Open menu">
-          <HiMenu />
-        </button>
-        <div className="top-navbar__search">
-          <FiSearch className="search-icon" aria-hidden />
-          <input
-            type="search"
-            placeholder="Find in this website"
-            aria-label="Find in this website"
-          />
-          <button type="button" className="filter-btn" aria-label="Filter search">
-            <FiFilter />
-          </button>
-        </div>
-        <div className="top-navbar__actions">
-          <button type="button" className="top-navbar__undo">
-            <IoMdUndo />
-            Undo
-          </button>
-          <button type="button" className="top-navbar__bell" aria-label="Notifications">
-            <HiOutlineBell />
-          </button>
-          <button type="button" className="top-navbar__avatar" aria-label="User menu">
-            <img
-              src="https://i.pravatar.cc/40?img=12"
-              alt=""
-              className="avatar-img"
-            />
-            <HiOutlineDotsVertical className="avatar-chevron" />
-          </button>
-        </div>
-      </header>
-
-      <div className="dashboard-body">
-        <JourneySidebar />
-        <PlanningSidebar
-          selectedPage={selectedPage}
-          setSelectedPage={setSelectedPage}
-        />
-        <main className="dashboard-content">
-          {children ?? <DashboardMain />}
-        </main>
       </div>
     </div>
   );

@@ -1,0 +1,54 @@
+.itinerary-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding-bottom: 34px;
+  border-bottom: 1px solid #e8e8e8;
+}
+
+.itinerary-header h1 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.itinerary-header p {
+  margin: 8px 0 0;
+  color: #666;
+  font-size: 14px;
+}
+
+.header-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.header-actions button {
+  height: 38px;
+  padding: 0 18px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.export-btn {
+  background: #ffffff;
+  border-color: #dddddd !important;
+  color: #333;
+}
+
+.itinerary-header .add-btn {
+  background: #45c0c0; 
+  color: white;
+}
+
+@media (max-width: 1200px) {
+  .itinerary-header {
+    flex-direction: column;
+    gap: 16px;
+  }
+}
