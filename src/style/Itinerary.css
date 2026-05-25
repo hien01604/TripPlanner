@@ -1,12 +1,19 @@
 .itinerary-page {
   min-height: 100vh;
-  padding: 42px 32px;
+  padding: 0 0;
   background: #ffffff;
-  font-family: Arial, sans-serif;
+  font-family: Inter, sans-serif;
   color: #242424;
 }
 
-@media (max-width: 900px) {
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+@media (max-width: 1200px) {
   .itinerary-page {
     padding: 24px 18px;
   }

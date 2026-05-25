@@ -6,6 +6,7 @@ import Filterbar from "../components/Filterbar"
 import CategorySidebar from "../components/CategorySidebar"
 import PackingTable from "../components/PackingTable"
 import ItemModal from "../components/ItemModal"
+import BreadCrumb from "../components/BreadCrumb"
 import "../style/Packing.css"
 
 function Packing({ selectedTripIndex = 0 }) {
@@ -14,6 +15,9 @@ function Packing({ selectedTripIndex = 0 }) {
 
   const items = useSelector(
     state => state.trip.trips[tripIndex]?.packingList ?? []
+  )
+  const tripName = useSelector(
+    state => state.trip.trips[tripIndex]?.tripName ?? []
   )
 
   const [selectedCategory, setSelectedCategory] = useState("Clothes")
@@ -32,31 +36,30 @@ function Packing({ selectedTripIndex = 0 }) {
 
   const deleteItem = (id) => dispatch(deletePackingItem({ tripIndex, itemId: id }))
 
-const addItem = (newItem) => {
-  const currentPackingList = trips[tripIndex]?.packingList || []
+  const addItem = (newItem) => {
+    const currentPackingList = trips[tripIndex]?.packingList || []
+    const isDuplicate = currentPackingList.some(
+      (item) =>
+        item.name.trim().toLowerCase() === newItem.name.trim().toLowerCase()
+    )
 
-  const isDuplicate = currentPackingList.some(
-    (item) =>
-      item.name.trim().toLowerCase() === newItem.name.trim().toLowerCase()
-  )
+    if (isDuplicate) {
+      return false
+    }
 
-  if (isDuplicate) {
-    return false
+    dispatch(
+      addPackingItem({
+        tripIndex,
+        item: {
+          ...newItem,
+          id: Date.now(),
+          packedStatus: "Not Packed",
+        },
+      })
+    )
+
+    return true
   }
-
-  dispatch(
-    addPackingItem({
-      tripIndex,
-      item: {
-        ...newItem,
-        id: Date.now(),
-        packedStatus: "Not Packed",
-      },
-    })
-  )
-
-  return true
-}
 
   const updateItem = (updatedItem) => dispatch(updatePackingItem({ tripIndex, item: updatedItem }))
 
@@ -99,6 +102,14 @@ const filteredItems = items.filter(item => {
 
   return (
     <>
+      <div className="itinerary-topbar">
+        <BreadCrumb tripName= {tripName} pageName="Packing" />
+
+        {/* <div className="last-modified">
+          <span className="status-dot"></span>
+          Last modified at {formatLastModified(lastModified)}
+        </div> */}
+      </div>
       <h1 className="packing-title">Checklist</h1>
       <p className="packing-subtitle">Track your packing items before the trip</p>
 

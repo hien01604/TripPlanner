@@ -4,12 +4,19 @@
   box-sizing:border-box;
 }
 
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
 body {
   background: #f7f7f7;
 }
 
 .sidebar {
-  position: relative;
+  min-width: clamp(180px, 22vw, 280px);
   height: 100vh;
   background: white;
   border-right: 1px solid #ddd;
@@ -65,6 +72,11 @@ body {
   transition: 0.2s;
 }
 
+.journey-item-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 .journey-item--management {
   margin-top: auto;
 }
@@ -165,6 +177,7 @@ body {
   align-items: center;
   justify-content: center;
   gap: 10px;
+  flex-shrink: 0;
 
   cursor: pointer;
 }
@@ -173,20 +186,13 @@ body {
   background: linear-gradient(135deg, #115e59, #0f766e);
 }
 
-/* Resize handle */
-.sidebar-resize-handle {
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 5px;
-  height: 100%;
-  cursor: col-resize;
-  background: transparent;
-  z-index: 10;
-  transition: background 0.15s ease;
+
+@media (max-width: 1200px) {
 }
 
-.sidebar-resize-handle:hover,
-.sidebar-resize-handle:active {
-  background: rgba(20, 184, 166, 0.35);
+@media (max-width: 768px) {
+  .sidebar {
+    width: 100%;
+    height: auto;
+  }
 }

@@ -1,12 +1,11 @@
+import BreadCrumb from "../BreadCrumb"
 import { formatLastModified } from "../../data/itineraryUtils";
 import "../../style/itinerary/ItineraryTopbar.css";
 
-const ItineraryTopbar = ({ lastModified }) => {
+const ItineraryTopbar = ({ tripName, lastModified }) => {
   return (
     <div className="itinerary-topbar">
-      <div className="breadcrumb">
-        <strong>Itinerary</strong>
-      </div>
+      <BreadCrumb tripName= {tripName} pageName="Itinerary" />
 
       <div className="last-modified">
         <span className="status-dot"></span>

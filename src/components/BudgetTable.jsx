@@ -73,7 +73,7 @@ export default function BudgetTable({ items = [], categories, onSaveRow, onDelet
                     ))}
                 </div>
             </div>
-            <div className='table-wrap'>
+            <div className='budget-table-wrap'>
                 <table className='budget-table'>
                     <thead>
                         <tr>

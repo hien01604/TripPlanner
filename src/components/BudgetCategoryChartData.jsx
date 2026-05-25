@@ -25,7 +25,9 @@ function BudgetCategoryChartData({ categories = [], data = {} }) {
     };
 
     const options = {
-        cutout: '50%',
+        cutout: '70%',
+        responsive: true,
+        maintainAspectRatio: true,
     }
     return (
         <Doughnut data={donutData} options={options}/>
