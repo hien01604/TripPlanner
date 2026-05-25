@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+
 import ActivityModal from "../components/itinerary/ActivityModal";
 import ActivityTimeline from "../components/itinerary/ActivityTimeline";
 import DaySection from "../components/itinerary/DaySection";
@@ -27,6 +28,10 @@ const Itinerary = ({ selectedTripIndex = 0 }) => {
   const dispatch = useDispatch();
   const activities = useSelector(
     (state) => state.trip.trips[selectedTripIndex]?.itinerary || []
+  );
+
+  const tripName = useSelector(
+    (state) => state.trip.trips[selectedTripIndex]?.tripName || []
   );
 
   const [lastModified, setLastModified] = useState(() => {
@@ -191,7 +196,7 @@ const Itinerary = ({ selectedTripIndex = 0 }) => {
 
   return (
     <div className="itinerary-page">
-      <ItineraryTopbar lastModified={lastModified} />
+      <ItineraryTopbar tripName={tripName} lastModified={lastModified} />
       <ItineraryHeader
         activityCount={filteredActivities.length}
         onAddActivity={openAddModal}

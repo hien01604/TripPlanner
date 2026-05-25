@@ -71,6 +71,11 @@ body {
   transition: 0.2s;
 }
 
+.journey-item-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 .journey-item--management {
   margin-top: auto;
 }

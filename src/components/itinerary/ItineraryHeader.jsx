@@ -4,6 +4,7 @@ import "../../style/itinerary/ItineraryHeader.css";
 const ItineraryHeader = ({ activityCount, onAddActivity, onExport }) => {
   return (
     <div className="itinerary-header">
+      
       <div>
         <h1>Itinerary</h1>
         <p>{activityCount} activities planned</p>

@@ -6,9 +6,9 @@ import { getBudgetSummary } from '../services/budgetService'
 
 // Icons
 import { IoMdAdd } from "react-icons/io";
-import { FiChevronRight } from "react-icons/fi";
 
 // Components
+import BreadCrumb from '../components/BreadCrumb'
 import BudgetCategoryChartData  from '../components/BudgetCategoryChartData'
 import LastModifiedLine from '../components/LastModifiedLine'
 import BudgetTable from '../components/BudgetTable'
@@ -89,11 +89,7 @@ export default function Budget({ selectedTripIndex = 0 }) {
         <div className='budget-page'>
             <header className='budget-header' id='header' >
                 <div className="itinerary-topbar">
-                  <div className="breadcrumb">
-                    <span>{trip.tripName}</span>
-                    <FiChevronRight />
-                    <strong>Budget</strong>
-                  </div>
+                  <BreadCrumb tripName={trip.tripName} pageName='Budget'></BreadCrumb>
           
                   <LastModifiedLine lastModified={lastModified}/>
                 </div>

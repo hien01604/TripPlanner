@@ -22,7 +22,7 @@ import {
   Legend,
 } from "recharts";
 import "../style/Dashboard.css";
-
+import BreadCrumb from "../components/BreadCrumb"
 
 
 const STAT_ICON_COMPONENTS = {
@@ -338,7 +338,7 @@ const packingCategories = defaultCategoryPacking.map((label) => {
     <div className="dashboard-main">
       <header className="dashboard-page-header">
         <div className="dashboard-page-header__left">
-          <p className="breadcrumb">Japan &gt; Dash Board</p>
+          <BreadCrumb tripName={trip.tripName} pageName="Dash Board" />
           <h1 className="dashboard-title">Dash Board</h1>
           <p className="dashboard-subtitle">
             Track your trip progress at a glance.

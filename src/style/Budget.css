@@ -608,6 +608,12 @@
   }
 }
 @media (max-width: 768px){
+  .budget-header-content {
+    flex-direction:column;
+  }
+  .button-group {
+    flex-direction: column;
+  }
   .budget-content {
     flex-direction: column; 
     gap: 12px;
