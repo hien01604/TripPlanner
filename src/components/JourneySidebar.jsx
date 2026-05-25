@@ -2,10 +2,10 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { FaEdit, FaPlus, FaSuitcaseRolling, FaTrash } from "react-icons/fa";
 import { HiOutlineDotsVertical } from "react-icons/hi";
-import AddJourneyModal from "./AddJourneyModal";
-import MessageBox from "./MessageBox";
+import MessageBox from "./journey/MessageBox";
 import { deleteTrip, updateTrip } from "../data/tripSlice";
 import "../style/JourneySidebar.css";
+import AddJourneyModal from "./journey/AddJourneyModal";
 
 function JourneySidebar({
   selectedPage,

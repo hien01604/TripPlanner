@@ -1,5 +1,5 @@
 import { useState } from "react"
-import "../style/ItemModal.css"
+import "../../style/ItemModal.css"
 
 function ItemModal({ closeModal, addItem, editingItem, updateItem }) {
   const isEditing = !!editingItem?.id

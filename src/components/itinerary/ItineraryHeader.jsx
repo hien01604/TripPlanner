@@ -16,7 +16,7 @@ const ItineraryHeader = ({ activityCount, onAddActivity, onExport }) => {
           Export
         </button>
 
-        <button className="add-btn" onClick={onAddActivity}>
+        <button className="add-btn1" onClick={onAddActivity}>
           + Add Activity
         </button>
       </div>

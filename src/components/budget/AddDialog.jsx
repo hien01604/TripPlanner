@@ -1,4 +1,4 @@
-import '../style/Budget.css'
+import '../../style/Budget.css'
 function AddDialog({ formData, categories, onChange, onSubmit, onCancel }) {
     function handleChange(e) {
         onChange(e)

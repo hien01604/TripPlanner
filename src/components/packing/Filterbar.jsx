@@ -1,4 +1,4 @@
-import "../style/Filterbar.css"
+import "../../style/Filterbar.css"
 
 function Filterbar({ searchTerm, setSearchTerm, statusFilter, setStatusFilter, typeFilter, setTypeFilter }) {
   return (

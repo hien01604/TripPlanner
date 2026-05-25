@@ -1,4 +1,4 @@
-import "../style/ProgressSection.css"
+import "../../style/ProgressSection.css"
 
 function ProgressSection({ totalItems, packedItems, requiredItems, progress }) {
   return (

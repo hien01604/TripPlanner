@@ -1,4 +1,4 @@
-import "../style/MessageBox.css";
+import "../../style/MessageBox.css";
 
 export default function MessageBox({ visible, title, message, onConfirm, onCancel, confirmText = "Confirm", cancelText = "Cancel" }) {
     if (!visible) return null;

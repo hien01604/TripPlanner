@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { FaCalendarAlt, FaEdit, FaMapMarkerAlt, FaMoneyBillWave, FaTrash } from "react-icons/fa";
 import { HiOutlineDotsVertical } from "react-icons/hi";
 
-import "../style/JourneyCard.css";
+import "../../style/JourneyCard.css";
 
 function JourneyCard({ journey, onClick, onEditJourney, onDeleteJourney, active = false }) {
     const [openMenu, setOpenMenu] = useState(false);

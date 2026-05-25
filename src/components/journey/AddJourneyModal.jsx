@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { FaTimes } from "react-icons/fa";
 
-import { fileToBase64 } from "../utils/fileUtils";
-import "../style/AddJourneyModal.css";
+import { fileToBase64 } from "../../utils/fileUtils";
+import "../../style/AddJourneyModal.css";
 
 export default function AddJourneyModal({
     onClose,

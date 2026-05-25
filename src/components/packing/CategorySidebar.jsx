@@ -1,5 +1,5 @@
 import { FaTshirt, FaFileAlt, FaLaptop, FaMedkit, FaUser, FaBox } from "react-icons/fa"
-import "../style/CategorySidebar.css"
+import "../../style/CategorySidebar.css"
 
 const CATEGORIES = [
   { name: "Clothes",     icon: <FaTshirt /> },

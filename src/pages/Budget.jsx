@@ -9,10 +9,10 @@ import { IoMdAdd } from "react-icons/io";
 
 // Components
 import BreadCrumb from '../components/BreadCrumb'
-import BudgetCategoryChartData  from '../components/BudgetCategoryChartData'
-import LastModifiedLine from '../components/LastModifiedLine'
-import BudgetTable from '../components/BudgetTable'
-import AddDialog from '../components/AddDialog'
+import BudgetCategoryChartData  from '../components/budget/BudgetCategoryChartData'
+import LastModifiedLine from '../components/packing/LastModifiedLine'
+import BudgetTable from '../components/budget/BudgetTable'
+import AddDialog from '../components/budget/AddDialog'
 
 const LAST_MODIFIED_KEY = "tripplanner-budget-last-modified";
 
@@ -61,7 +61,6 @@ export default function Budget({ selectedTripIndex = 0 }) {
     const totalBudget = Number(trip?.budget) || 0;
 
     const summary = getBudgetSummary({ budgetItems, totalBudget })
-    
     function handleAddClick() {
         setIsDialogOpen(true);
     };
