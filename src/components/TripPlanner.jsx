@@ -80,6 +80,7 @@ function TripPlanner({
       </header>
 
       <div className="dashboard-body">
+        {/* Desktop */}
         {showJourneySidebar && (
           <JourneySidebar
             selectedPage={selectedPage}

@@ -4,12 +4,19 @@
   box-sizing:border-box;
 }
 
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
 body {
   background: #f7f7f7;
 }
 
 .sidebar {
-  width: 220px;
+  min-width: clamp(180px, 22vw, 280px);
   height: 100vh;
   background: white;
   border-right: 1px solid #ddd;
@@ -164,10 +171,22 @@ body {
   align-items: center;
   justify-content: center;
   gap: 10px;
+  flex-shrink: 0;
 
   cursor: pointer;
 }
 
 .create-btn:hover {
   background: linear-gradient(135deg, #115e59, #0f766e);
+}
+
+
+@media (max-width: 1200px) {
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    width: 100%;
+    height: auto;
+  }
 }

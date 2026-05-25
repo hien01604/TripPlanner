@@ -23,7 +23,7 @@
   border-radius: 8px;
   background: #c9f3f1;
   color: #3b9696;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.22);
+  box-shadow:0 2px 4px rgba(0,0,0,0.1);
   display: grid;
   place-items: center;
   font-weight: 700;

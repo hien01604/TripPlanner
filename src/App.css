@@ -18,6 +18,7 @@ body {
 }
 
 .sidebars {
+  flex-basis: 0;
   position: relative;
   display: flex;
   transition: width 0.3s ease;

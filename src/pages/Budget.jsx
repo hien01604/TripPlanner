@@ -269,8 +269,13 @@ export default function Budget({ selectedTripIndex = 0 }) {
                               </strong>
                               {' '} the most in this trip
                             </p>
-                          </div>}
-                      <BudgetCategoryChartData categories={ CATEGORIES } data={ summary.spendingPerCategory } />
+                          </div>
+                      }
+                      <div className='chart-shell'>
+                        <div className='chart-box'>
+                          <BudgetCategoryChartData categories={ CATEGORIES } data={ summary.spendingPerCategory } />
+                        </div>
+                      </div>
                     </div>
                 </div>
             </main>
