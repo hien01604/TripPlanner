@@ -39,10 +39,10 @@ export default function AddJourneyModal({
     };
 
     const clearError = (fieldName) => {
-        setErrors((currentErrors) => ({
-            ...currentErrors,
-            [fieldName]: "",
-        }));
+        setErrors((currentErrors) => {
+            const { [fieldName]: _, ...remainingErrors } = currentErrors;
+            return remainingErrors;
+        });
     };
 
     const handleCreate = () => {
