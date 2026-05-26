@@ -904,7 +904,7 @@ textarea {
 
   .dashboard-body .sidebar,
   .dashboard-body .planning-sidebar {
-    width: 100%;
+    width: 100%!important; 
     height: 50dvh;
     min-width: 0;
     border-right: none;

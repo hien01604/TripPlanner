@@ -356,7 +356,7 @@ const itineraryPercent =
               <FiCalendar aria-hidden />
               {tripDatesDisplay}
             </p>
-            <button type="button" className="btn-view-itinerary">
+            <button type="button" className="btn-view-itinerary" onClick={() => setSelectedPage("Itinerary")}>
               View Itinerary
               <span className="btn-arrow" aria-hidden>
                 →
@@ -428,7 +428,7 @@ const itineraryPercent =
               </span>
               <h2>Packing Progress</h2>
               </div>
-              <a href="#packing" className="link-teal">
+              <a href="#packing" className="link-teal" onClick={() => setSelectedPage("Packing")}>
                 See all items →
               </a>
             </div>
